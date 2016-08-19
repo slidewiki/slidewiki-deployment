@@ -88,6 +88,27 @@ importservice:
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=importservice.localhost
 
+userservice:
+  image: slidewiki/userservice
+  restart: on-failure:5
+  expose:
+    - "80"
+  links:
+    - database
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - VIRTUAL_HOST=userservice.localhost
+
+pdfservice:
+  image: slidewiki/pdfservice
+  restart: on-failure:5
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - VIRTUAL_HOST=pdfservice.localhost
+
 database:
   image: mongo
   restart: on-failure:5
