@@ -27,6 +27,14 @@ platform:
   environment:
     - PORT=80
     - VIRTUAL_HOST=platform.localhost
+    - SERVICE_URL_DECK="http://deckservice.localhost"
+    - SERVICE_URL_DISCUSSION="http://discussionservice.localhost"
+    - SERVICE_URL_ACTIVITIES="http://activitiesservice.localhost"
+    - SERVICE_URL_NOTIFICATION="http://notificationservice.localhost"
+    - SERVICE_URL_USER="http://userservice.localhost"
+    - SERVICE_URL_IMPORT="http://importservice.localhost"
+    - SERVICE_URL_FILE="http://fileservice.localhost"
+    - SERVICE_VAR_IMPORT_HOST="importservice.localhost"
 
 deckservice:
   image: slidewiki/deckservice
