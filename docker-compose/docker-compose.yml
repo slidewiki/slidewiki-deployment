@@ -2,22 +2,11 @@ webserver:
   image: jwilder/nginx-proxy
   restart: on-failure:5
   ports:
-    - 80:80
-    - 443:443
+    - "80:80"
+    - "443:443"
   volumes:
     - /var/run/docker.sock:/tmp/docker.sock:ro
     - ./client_max_body_size.conf:/etc/nginx/conf.d/client_max_body_size.conf:ro
-#    - ./certs:/etc/nginx/certs:ro
-#    - /etc/nginx/vhost.d
-#    - /usr/share/nginx/html
-
-#letsencrypt:
-#  image: jrcs/letsencrypt-nginx-proxy-companion
-#  volumes:
-#    - /var/run/docker.sock:/var/run/docker.sock:ro
-#    - ./certs:/etc/nginx/certs
-#  volumes_from:
-#    - webserver
 
 platform:
   image: slidewiki/platform
@@ -35,6 +24,11 @@ platform:
     - SERVICE_URL_IMPORT="http://importservice.localhost"
     - SERVICE_URL_FILE="http://fileservice.localhost"
     - SERVICE_VAR_IMPORT_HOST="importservice.localhost"
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.platform"
+
 
 deckservice:
   image: slidewiki/deckservice
@@ -42,11 +36,16 @@ deckservice:
   expose:
     - "80"
   links:
-    - database
+    - mongodb
   environment:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=deckservice.localhost
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.deckservice"
+
 
 activitiesservice:
   image: slidewiki/activitiesservice
@@ -54,11 +53,15 @@ activitiesservice:
   expose:
     - "80"
   links:
-    - database
+    - mongodb
   environment:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=activitiesservice.localhost
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.activitiesservice"
 
 discussionservice:
   image: slidewiki/discussionservice
@@ -66,11 +69,15 @@ discussionservice:
   expose:
     - "80"
   links:
-    - database
+    - mongodb
   environment:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=discussionservice.localhost
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.discussionservice"
 
 notificationservice:
   image: slidewiki/notificationservice
@@ -78,11 +85,15 @@ notificationservice:
   expose:
     - "80"
   links:
-    - database
+    - mongodb
   environment:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=notificationservice.localhost
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.notificationservice"
 
 importservice:
   image: slidewiki/importservice
@@ -90,13 +101,17 @@ importservice:
   expose:
     - "80"
   links:
-    - database
+    - mongodb
   environment:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=importservice.localhost
   volumes_from:
     - volume_share
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.importservice"
 
 userservice:
   image: slidewiki/userservice
@@ -104,11 +119,15 @@ userservice:
   expose:
     - "80"
   links:
-    - database
+    - mongodb
   environment:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=userservice.localhost
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.userservice"
 
 pdfservice:
   image: slidewiki/pdfservice
@@ -118,13 +137,12 @@ pdfservice:
   environment:
     - APPLICATION_PORT=80
     - VIRTUAL_HOST=pdfservice.localhost
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.pdfservice"
 
-database:
-  image: mongo
-  restart: on-failure:5
-  volumes:
-    - ./database:/data/db:rw
-    
+
 fileservice:
   image: slidewiki/fileservice
   restart: on-failure:5
@@ -135,5 +153,31 @@ fileservice:
     - APPLICATION_PATH=/data/files
     - VIRTUAL_HOST=fileservice.localhost
   volumes_from:
-    - volume_share
-  
+    - datapod
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.fileservice"
+
+mongodb:
+  image: mongo
+  restart: on-failure:5
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.mongodb"
+#  volumes:
+#    - ./database:/data/db:rw
+
+datapod:
+  image: slidewiki/fileservice
+  entrypoint: /bin/echo
+
+logger:
+  image: slidewiki/logger
+  restart: on-failure:5
+  ports:
+    - "24224:24224"
+  volumes:
+    - /var/log/slidewiki:/fluentd/log
+  privileged: true
