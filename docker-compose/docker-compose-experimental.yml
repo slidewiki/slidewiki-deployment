@@ -139,7 +139,7 @@ searchservice:
 solr:
   image: solr
   container_name: solr
-  restart: on-failure:5
+  restart: always
   expose:
    - "8983"
   volumes:
@@ -150,7 +150,7 @@ solr:
 mongodb:
   image: mongo
   container_name: mongodb
-  restart: on-failure:5
+  restart: always
   expose:
     - "27017"
   volumes_from:
