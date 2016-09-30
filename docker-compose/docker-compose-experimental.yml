@@ -133,15 +133,17 @@ searchservice:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=searchservice.experimental.slidewiki.org
-    - SERVICE_URL_USER=http://userservice..experimental.slidewiki.org
+    - SERVICE_URL_USER=http://userservice.experimental.slidewiki.org
     - SOLR_CORE=swikcore
 
 solr:
   image: solr
   container_name: solr
   restart: always
-  expose:
-   - "8983"
+#  expose:
+#   - "8983"
+  ports:
+    - "8983:8983"
   volumes:
     - ./solrserver-config/solr-config:/opt/solr/server/solr:rw
   volumes_from:
