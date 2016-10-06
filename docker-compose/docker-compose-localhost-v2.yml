@@ -1,0 +1,198 @@
+version: '2'
+services:
+  webserver:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - front-trier
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./client_max_body_size.conf:/etc/nginx/conf.d/client_max_body_size.conf:ro
+
+  platform:
+    image: slidewiki/platform
+  #  build: /home/rmeissner/.git/slidewiki-platform/
+    expose:
+      - "80"
+    environment:
+      - PORT=80
+      - VIRTUAL_HOST=platform.localhost
+      - SERVICE_URL_DECK=http://deckservice
+      - SERVICE_URL_DISCUSSION=http://discussionservice
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice
+      - SERVICE_URL_NOTIFICATION=http://notificationservice
+      - SERVICE_URL_USER=http://userservice
+      - SERVICE_URL_IMPORT=http://importservice
+      - SERVICE_URL_FILE=http://fileservice
+      - SERVICE_URL_SEARCH=http://searchservice
+      - SERVICE_VAR_IMPORT_HOST=importservice
+    networks:
+      - front-trier
+    depends_on:
+      - webserver
+      - deckservice
+      - activitiesservice
+      - discussionservice
+      - notificationservice
+      - importservice
+      - userservice
+      - pdfservice
+      - fileservice
+
+  deckservice:
+    image: slidewiki/deckservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - VIRTUAL_HOST=deckservice.localhost
+    depends_on:
+      - mongodb
+
+  activitiesservice:
+    image: slidewiki/activitiesservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - VIRTUAL_HOST=activitiesservice.localhost
+    depends_on:
+      - mongodb
+
+  discussionservice:
+    image: slidewiki/discussionservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - VIRTUAL_HOST=discussionservice.localhost
+    depends_on:
+      - mongodb
+
+  notificationservice:
+    image: slidewiki/notificationservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - VIRTUAL_HOST=notificationservice.localhost
+    depends_on:
+      - mongodb
+
+  importservice:
+    image: slidewiki/importservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - VIRTUAL_HOST=importservice.localhost
+    volumes:
+      - ./images:/data/files/:rw
+    depends_on:
+      - deckservice
+      - fileservice
+
+  userservice:
+    image: slidewiki/userservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - VIRTUAL_HOST=userservice.localhost
+    depends_on:
+      - mongodb
+
+  pdfservice:
+    image: slidewiki/pdfservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+    environment:
+      - APPLICATION_PORT=80
+      - VIRTUAL_HOST=pdfservice.localhost
+
+  fileservice:
+    image: slidewiki/fileservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+    environment:
+      - APPLICATION_PORT=80
+      - APPLICATION_PATH=/data/files
+      - VIRTUAL_HOST=fileservice.localhost
+    volumes:
+      - ./images:/data/files:ro
+
+  searchservice:
+    image: slidewiki/searchservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - VIRTUAL_HOST=searchservice.localhost
+      - SERVICE_URL_USER=http://userservice
+      - SOLR_CORE=swikcore
+    depends_on:
+      - mongodb
+
+  solr:
+    image: solr
+    container_name: solr
+    ports:
+      - "8983:8983"
+    networks:
+      - back-trier
+    volumes:
+      - ./solrserver-config/solr-config:/opt/solr/server/solr:rw
+      - ./solrserver-config/solr-data:/solr-data
+    depends_on:
+      - searchservice
+
+  mongodb:
+    image: mongo
+    expose:
+        - "27017"
+    networks:
+      - back-trier
+    volumes:
+      - ./database:/data/db:rw
+
+networks:
+  front-trier:
+  back-trier:
+
+#volumes:
+#  mongo-data:
+#  files:
