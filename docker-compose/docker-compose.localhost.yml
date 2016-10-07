@@ -1,6 +1,5 @@
 webserver:
   image: jwilder/nginx-proxy
-  restart: on-failure:5
   ports:
     - "80:80"
     - "443:443"
@@ -11,7 +10,6 @@ webserver:
 platform:
   image: slidewiki/platform
 #  build: /home/rmeissner/.git/slidewiki-platform/
-  restart: on-failure:5
   expose:
     - "80"
   environment:
@@ -36,7 +34,6 @@ platform:
 
 deckservice:
   image: slidewiki/deckservice
-  restart: on-failure:5
   expose:
     - "80"
   links:
@@ -48,7 +45,6 @@ deckservice:
 
 activitiesservice:
   image: slidewiki/activitiesservice
-  restart: on-failure:5
   expose:
     - "80"
   links:
@@ -60,7 +56,6 @@ activitiesservice:
 
 discussionservice:
   image: slidewiki/discussionservice
-  restart: on-failure:5
   expose:
     - "80"
   links:
@@ -72,7 +67,6 @@ discussionservice:
 
 notificationservice:
   image: slidewiki/notificationservice
-  restart: on-failure:5
   expose:
     - "80"
   links:
@@ -84,7 +78,6 @@ notificationservice:
 
 importservice:
   image: slidewiki/importservice
-  restart: on-failure:5
   expose:
     - "80"
   links:
@@ -98,7 +91,6 @@ importservice:
 
 userservice:
   image: slidewiki/userservice
-  restart: on-failure:5
   expose:
     - "80"
   links:
@@ -110,7 +102,6 @@ userservice:
 
 pdfservice:
   image: slidewiki/pdfservice
-  restart: on-failure:5
   expose:
     - "80"
   environment:
@@ -119,7 +110,6 @@ pdfservice:
 
 fileservice:
   image: slidewiki/fileservice
-  restart: on-failure:5
   expose:
     - "80"
   environment:
@@ -131,7 +121,6 @@ fileservice:
 
 mongodb:
   image: mongo
-  restart: on-failure:5
   expose:
       - "27017"
   volumes:
