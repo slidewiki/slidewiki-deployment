@@ -1,0 +1,95 @@
+version: '2'
+services:
+  platform:
+  #  build: /home/rmeissner/.git/slidewiki-platform/
+    environment:
+      - VIRTUAL_HOST=platform.localhost
+      - SERVICE_URL_DECK=http://deckservice
+      - SERVICE_URL_DISCUSSION=http://discussionservice
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice
+      - SERVICE_URL_NOTIFICATION=http://notificationservice
+      - SERVICE_URL_USER=http://userservice
+      - SERVICE_URL_IMPORT=http://importservice
+      - SERVICE_URL_FILE=http://fileservice
+      - SERVICE_URL_SEARCH=http://searchservice
+      - SERVICE_VAR_IMPORT_HOST=importservice
+    depends_on:
+      - webserver
+      - deckservice
+      - activitiesservice
+      - discussionservice
+      - notificationservice
+      - importservice
+      - userservice
+      - pdfservice
+      - fileservice
+
+  deckservice:
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=deckservice.localhost
+
+  activitiesservice:
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=activitiesservice.localhost
+
+  discussionservice:
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=discussionservice.localhost
+
+  notificationservice:
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=notificationservice.localhost
+
+  importservice:
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=importservice.localhost
+    volumes:
+      - ./images:/data/files/:rw
+    depends_on:
+      - deckservice
+      - fileservice
+
+  userservice:
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=userservice.localhost
+
+  pdfservice:
+    environment:
+      - VIRTUAL_HOST=pdfservice.localhost
+
+  fileservice:
+    environment:
+      - VIRTUAL_HOST=fileservice.localhost
+    volumes:
+      - ./images:/data/files:ro
+
+  searchservice:
+    links:
+      - mongodb
+      - solr
+    environment:
+      - VIRTUAL_HOST=searchservice.localhost
+      - SERVICE_URL_USER=http://userservice
+
+  solr:
+    ports:
+      - "8983:8983"
+    volumes:
+      - ./solrserver-config/solr-config:/opt/solr/server/solr:rw
+      - ./solrserver-config/solr-data:/solr-data
+
+  mongodb:
+    volumes:
+      - ./database:/data/db:rw

@@ -1,0 +1,139 @@
+version: '2'
+services:
+  webserver:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - front-trier
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ../client_max_body_size.conf:/etc/nginx/conf.d/client_max_body_size.conf:ro
+
+  platform:
+    image: slidewiki/platform
+    expose:
+      - "80"
+    environment:
+      - PORT=80
+    networks:
+      - front-trier
+
+  deckservice:
+    image: slidewiki/deckservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+
+  activitiesservice:
+    image: slidewiki/activitiesservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+
+  discussionservice:
+    image: slidewiki/discussionservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+
+  notificationservice:
+    image: slidewiki/notificationservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+
+  importservice:
+    image: slidewiki/importservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+
+  userservice:
+    image: slidewiki/userservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+
+  pdfservice:
+    image: slidewiki/pdfservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+    environment:
+      - APPLICATION_PORT=80
+
+  fileservice:
+    image: slidewiki/fileservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+    environment:
+      - APPLICATION_PORT=80
+      - APPLICATION_PATH=/data/files
+
+  searchservice:
+    image: slidewiki/searchservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - SOLR_CORE=swikcore
+
+  solr:
+    image: solr
+    container_name: solr
+    expose:
+      - "8983"
+    networks:
+      - back-trier
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    expose:
+        - "27017"
+    networks:
+      - back-trier
+    command: mongod --replSet "rs0"
+
+networks:
+  front-trier: {}
+  back-trier: {}

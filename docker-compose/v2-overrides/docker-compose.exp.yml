@@ -1,0 +1,114 @@
+version: '2'
+services:
+  webserver:
+    restart: always
+
+  platform:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=platform.experimental.slidewiki.org
+      - SERVICE_URL_DECK=http://deckservice.experimental.slidewiki.org
+      - SERVICE_URL_DISCUSSION=http://discussionservice.experimental.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.experimental.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=http://notificationservice.experimental.slidewiki.org
+      - SERVICE_URL_USER=http://userservice.experimental.slidewiki.org
+      - SERVICE_URL_IMPORT=http://importservice.experimental.slidewiki.org
+      - SERVICE_URL_FILE=http://fileservice.experimental.slidewiki.org
+      - SERVICE_URL_SEARCH=http://searchservice.experimental.slidewiki.org
+      - SERVICE_VAR_IMPORT_HOST=importservice.experimental.slidewiki.org
+    depends_on:
+      - webserver
+      - deckservice
+      - activitiesservice
+      - discussionservice
+      - notificationservice
+      - importservice
+      - userservice
+      - pdfservice
+      - fileservice
+
+  deckservice:
+    restart: always
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=deckservice.experimental.slidewiki.org
+
+  activitiesservice:
+    restart: always
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=activitiesservice.experimental.slidewiki.org
+
+  discussionservice:
+    restart: always
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=discussionservice.experimental.slidewiki.org
+
+  notificationservice:
+    restart: always
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=notificationservice.experimental.slidewiki.org
+
+  importservice:
+    restart: always
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=importservice.experimental.slidewiki.org
+    volumes:
+      - files:/data/files
+    depends_on:
+      - deckservice
+      - fileservice
+
+  userservice:
+    restart: always
+    links:
+      - mongodb
+    environment:
+      - VIRTUAL_HOST=userservice.experimental.slidewiki.org
+
+  pdfservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=pdfservice.experimental.slidewiki.org
+
+  fileservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=fileservice.experimental.slidewiki.org
+    volumes:
+      - files:/data/files:ro
+
+  searchservice:
+    restart: always
+    links:
+      - mongodb
+      - solr
+    environment:
+      - VIRTUAL_HOST=searchservice.experimental.slidewiki.org
+      - SERVICE_URL_USER=http://userservice.experimental.slidewiki.org
+
+  solr:
+    restart: always
+    ports:
+      - "8983:8983"
+    volumes:
+      - ../solrserver-config/solr-config:/opt/solr/server/solr:rw
+      - solr-data:/solr-data
+
+  mongodb:
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data: {}
+  solr-data: {}
+  files: {}
