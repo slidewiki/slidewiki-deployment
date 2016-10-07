@@ -7,10 +7,11 @@ if [ $# -lt 1 ] ; then
   exit
 fi
 
-chown -R 8983:8983 solrserver-config/solr-*
-#docker-compose -f $1 pull
+chown -R 8983:8983 ../solrserver-config/solr-*
 docker-compose -f docker-compose.yml -f $1 up -d mongodb
-sleep 10s
+
+sleep 10s # Wait for MongoDB to initialize
+
 docker exec $(docker ps -f name=mongodb* -q) mongo --eval 'config = { _id : "rs0", "members" : [ {_id : 0, "host" : "localhost:27017"} ] }; rs.initiate(config);'
 docker exec mongodb chown -R 8983:8983 /solr-data/
 

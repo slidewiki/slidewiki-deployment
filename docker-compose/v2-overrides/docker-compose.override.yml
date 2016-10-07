@@ -13,8 +13,7 @@ services:
       - SERVICE_URL_FILE=http://fileservice
       - SERVICE_URL_SEARCH=http://searchservice
       - SERVICE_VAR_IMPORT_HOST=importservice
-    depends_on:
-      - webserver
+    links:
       - deckservice
       - activitiesservice
       - discussionservice
@@ -23,6 +22,8 @@ services:
       - userservice
       - pdfservice
       - fileservice
+    depends_on:
+      - webserver
 
   deckservice:
     links:
