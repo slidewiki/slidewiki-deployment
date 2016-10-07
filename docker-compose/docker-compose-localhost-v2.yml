@@ -48,12 +48,12 @@ services:
     networks:
       - front-trier
       - back-trier
+    links:
+      - mongodb
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - VIRTUAL_HOST=deckservice.localhost
-    depends_on:
-      - mongodb
 
   activitiesservice:
     image: slidewiki/activitiesservice
@@ -62,12 +62,12 @@ services:
     networks:
       - front-trier
       - back-trier
+    links:
+      - mongodb
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - VIRTUAL_HOST=activitiesservice.localhost
-    depends_on:
-      - mongodb
 
   discussionservice:
     image: slidewiki/discussionservice
@@ -76,12 +76,12 @@ services:
     networks:
       - front-trier
       - back-trier
+    links:
+      - mongodb
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - VIRTUAL_HOST=discussionservice.localhost
-    depends_on:
-      - mongodb
 
   notificationservice:
     image: slidewiki/notificationservice
@@ -90,12 +90,12 @@ services:
     networks:
       - front-trier
       - back-trier
+    links:
+      - mongodb
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - VIRTUAL_HOST=notificationservice.localhost
-    depends_on:
-      - mongodb
 
   importservice:
     image: slidewiki/importservice
@@ -104,6 +104,8 @@ services:
     networks:
       - front-trier
       - back-trier
+    links:
+      - mongodb
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
@@ -121,12 +123,12 @@ services:
     networks:
       - front-trier
       - back-trier
+    links:
+      - mongodb
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - VIRTUAL_HOST=userservice.localhost
-    depends_on:
-      - mongodb
 
   pdfservice:
     image: slidewiki/pdfservice
@@ -158,14 +160,15 @@ services:
     networks:
       - front-trier
       - back-trier
+    links:
+      - mongodb
+      - solr
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - VIRTUAL_HOST=searchservice.localhost
       - SERVICE_URL_USER=http://userservice
       - SOLR_CORE=swikcore
-    depends_on:
-      - mongodb
 
   solr:
     image: solr
@@ -177,8 +180,6 @@ services:
     volumes:
       - ./solrserver-config/solr-config:/opt/solr/server/solr:rw
       - ./solrserver-config/solr-data:/solr-data
-    depends_on:
-      - searchservice
 
   mongodb:
     image: mongo
