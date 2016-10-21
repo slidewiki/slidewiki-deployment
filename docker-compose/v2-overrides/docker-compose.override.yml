@@ -13,55 +13,82 @@ services:
       - SERVICE_URL_FILE=http://fileservice
       - SERVICE_URL_SEARCH=http://searchservice
       - SERVICE_VAR_IMPORT_HOST=importservice
-    links:
+    depends_on:
+      - webserver
       - deckservice
       - activitiesservice
       - discussionservice
       - notificationservice
       - importservice
+      - imageservice
       - userservice
       - pdfservice
       - fileservice
-    depends_on:
-      - webserver
 
   deckservice:
-    links:
+    depends_on:
       - mongodb
+      - fileservice
+      - imageservice
     environment:
       - VIRTUAL_HOST=deckservice.localhost
+      - SERVICE_URL_FILE=fileservice
+      - SERVICE_URL_IMAGE=imageservice
 
   activitiesservice:
-    links:
+    depends_on:
       - mongodb
+      - deckservice
+      - userservice
     environment:
       - VIRTUAL_HOST=activitiesservice.localhost
+      - SERVICE_URL_DECK=deckservice
+      - SERVICE_URL_USER=userservice
 
   discussionservice:
-    links:
+    depends_on:
       - mongodb
+      - deckservice
+      - userservice
+      - notificationservice
+      - activitiesservice
     environment:
       - VIRTUAL_HOST=discussionservice.localhost
+      - SERVICE_URL_DECK=deckservice
+      - SERVICE_URL_USER=userservice
+      - SERVICE_URL_NOTIFICATION=notificationservice
+      - SERVICE_URL_ACTIVITIES=activitiesservice
 
   notificationservice:
-    links:
+    depends_on:
       - mongodb
+      - userservice
     environment:
       - VIRTUAL_HOST=notificationservice.localhost
+      - SERVICE_URL_USER=userservice
 
   importservice:
-    links:
-      - mongodb
-    environment:
-      - VIRTUAL_HOST=importservice.localhost
-    volumes:
-      - ./images:/data/files/:rw
     depends_on:
+      - mongodb
       - deckservice
       - fileservice
+    environment:
+      - VIRTUAL_HOST=importservice.localhost
+      - SERVICE_URL_DECK=deckservice
+      - SERVICE_URL_FILE=fileservice
+    volumes:
+      - ./images:/data/files/:rw
+
+  imageservice:
+    depends_on:
+        - mongodb
+    environment:
+        - VIRTUAL_HOST=imageservice.localhost
+    volumes:
+      - ./images:/data/files/:rw
 
   userservice:
-    links:
+    depends_on:
       - mongodb
     environment:
       - VIRTUAL_HOST=userservice.localhost
@@ -77,9 +104,10 @@ services:
       - ./images:/data/files:ro
 
   searchservice:
-    links:
+    depends_on:
       - mongodb
       - solr
+      - userservice
     environment:
       - VIRTUAL_HOST=searchservice.localhost
       - SERVICE_URL_USER=http://userservice

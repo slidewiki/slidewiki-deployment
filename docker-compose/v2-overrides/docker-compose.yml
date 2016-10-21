@@ -75,6 +75,17 @@ services:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
 
+  imageservice:
+    image: slidewiki/imageservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+
   userservice:
     image: slidewiki/userservice
     expose:
