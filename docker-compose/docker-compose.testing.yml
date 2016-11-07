@@ -225,7 +225,6 @@ searchservice:
     - VIRTUAL_HOST=searchservice.testing.slidewiki.org
     - SERVICE_URL_USER=http://userservice.testing.slidewiki.org
     - SOLR_CORE=swikcore
-    - SERVICE_URL_USER=http://userservice.testing.slidewiki.org
 #  log_driver: fluentd
 #  log_opt:
 #    fluentd-address: "localhost:24224"
