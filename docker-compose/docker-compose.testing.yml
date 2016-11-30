@@ -66,7 +66,7 @@ activitiesservice:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=activitiesservice.testing.slidewiki.org
-    - SERVICE_URL_DECK=http://deckservice.testing.slidewiki.org
+    - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
     - SERVICE_URL_USER=http://userservice.testing.slidewiki.org
   log_driver: fluentd
   log_opt:
@@ -205,8 +205,8 @@ solr:
   image: solr
   container_name: solr
   restart: always
-#  expose:
-#   - "8983"
+  expose:
+    - "8983"
   ports:
     - "8983:8983"
   volumes:
