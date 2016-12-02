@@ -211,7 +211,7 @@ solr:
     - "8983:8983"
   volumes:
     - ./solrserver-config/solr-config:/opt/solr/server/solr:rw
-    - solr-data:/solr-data
+    - ./solrserver-config/solr-data:/solr-data
 #  volumes_from:
 #    - datapod
   log_driver: fluentd
