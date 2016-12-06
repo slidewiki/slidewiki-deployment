@@ -131,6 +131,27 @@ importservice:
   log_opt:
     fluentd-address: "localhost:24224"
     tag: "slidewiki.importservice"
+    
+imageservice:
+  image: slidewiki/imageservice
+  restart: on-failure:5
+  expose:
+    - "80"
+  links:
+    - mongodb
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - VIRTUAL_HOST=importservice.testing.slidewiki.org
+    - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
+  volumes:
+    - /data/files:/data/files
+#  volumes_from:
+#    - datapod:rw
+  log_driver: fluentd
+  log_opt:
+    fluentd-address: "localhost:24224"
+    tag: "slidewiki.importservice"
 
 userservice:
   image: slidewiki/userservice
