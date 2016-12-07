@@ -124,9 +124,7 @@ importservice:
     - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
     - SERVICE_URL_FILE=fileservice.testing.slidewiki.org
   volumes:
-    - /data/files:/data/files
-#  volumes_from:
-#    - datapod:rw
+    - files:/data/files
   log_driver: fluentd
   log_opt:
     fluentd-address: "localhost:24224"
@@ -145,9 +143,7 @@ imageservice:
     - VIRTUAL_HOST=importservice.testing.slidewiki.org
     - SERVICE_URL_FILE=fileservice.testing.slidewiki.org
   volumes:
-    - /data/files:/data/files
-#  volumes_from:
-#    - datapod:rw
+    - files:/data/files
   log_driver: fluentd
   log_opt:
     fluentd-address: "localhost:24224"
@@ -196,9 +192,7 @@ fileservice:
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=fileservice.testing.slidewiki.org
   volumes:
-    - /data/files:/data/files
-#  volumes_from:
-#    - datapod
+    - files:/data/files
   log_driver: fluentd
   log_opt:
     fluentd-address: "localhost:24224"
@@ -233,9 +227,7 @@ solr:
     - "8983:8983"
   volumes:
     - ./solrserver-config/solr-config:/opt/solr/server/solr:rw
-    - ./solrserver-config/solr-data:/solr-data
-#  volumes_from:
-#    - datapod
+    - solr-data:/solr-data
   log_driver: fluentd
   log_opt:
     fluentd-address: "localhost:24224"
@@ -247,8 +239,6 @@ mongodb:
   restart: always
   expose:
     - "27017"
-#  volumes_from:
-#    - datapod
   volumes:
    - database:/data/db
    - solr-data:/solr-data
@@ -257,16 +247,6 @@ mongodb:
   log_opt:
     fluentd-address: "localhost:24224"
     tag: "slidewiki.mongodb"
-
-#datapod:
-#  image: mongo
-#  container_name: datapod
-#  entrypoint: /bin/bash
-#  command: /bin/bash
-#  volumes:
-#    - /data/db
-#    - /data/files
-#    - /solr-data
 
 logger:
   image: slidewiki/logger
