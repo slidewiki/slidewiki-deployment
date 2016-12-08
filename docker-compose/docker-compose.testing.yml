@@ -129,7 +129,7 @@ importservice:
   log_opt:
     fluentd-address: "localhost:24224"
     tag: "slidewiki.importservice"
-    
+
 imageservice:
   image: slidewiki/imageservice
   restart: on-failure:5
@@ -258,12 +258,14 @@ logger:
   privileged: true
 
 maintenance:
-  image: slidewiki/maintenance
+  build: ./backup_scripts/
   restart: on-failure:5
   expose:
     - "80"
   environment:
     - VIRTUAL_HOST=maintenance.testing.slidewiki.org
+  link:
+    mongodb
   volumes:
-    - /data/maintenance:/data
-
+    - /data/maintenance:/maintenance
+    - files:/data/files
