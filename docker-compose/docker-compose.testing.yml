@@ -258,14 +258,14 @@ logger:
   privileged: true
 
 maintenance:
-  build: ./backup_scripts/
+  build: ../backup_scripts/
   restart: on-failure:5
   expose:
     - "80"
   environment:
     - VIRTUAL_HOST=maintenance.testing.slidewiki.org
-  link:
-    mongodb
+  links:
+    - mongodb
   volumes:
     - /data/maintenance:/maintenance
     - files:/data/files

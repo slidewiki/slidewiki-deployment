@@ -7,7 +7,7 @@ mkdir -p /data/maintenance/files
 
 echo "Creating dump from slidewiki database"
 echo ""
-mongodump --host mongodb:27017 --db slidewiki --gzip --archive /maintenance/db/slidewiki.mongodump.$BACKUP_DATE.archive.gz
+mongodump --host mongodb:27017 --db slidewiki --gzip --archive=/maintenance/db/slidewiki.mongodump.$BACKUP_DATE.archive.gz
 #tar --gzip -cvf /data/maintenance/db/slidewiki.mongodump.$BACKUP_DATE.tar.gz -C /tmp/slidewiki/ slidewiki
 echo ""
 
