@@ -1,3 +1,4 @@
+# Execute the prepare script first!
 webserver:
   image: jwilder/nginx-proxy
   restart: always
@@ -7,7 +8,7 @@ webserver:
   volumes:
     - /var/run/docker.sock:/tmp/docker.sock:ro
     - ./client_max_body_size.conf:/etc/nginx/conf.d/client_max_body_size.conf:ro
-    - ./htpasswd:/etc/nginx/htpasswd
+    - ./htpasswd:/etc/nginx/htpasswd # Not tracked as part of this repo
   log_driver: fluentd
   log_opt:
     fluentd-address: "localhost:24224"
@@ -241,7 +242,7 @@ mongodb:
     - "27017"
   volumes:
    - database:/data/db
-   - solr-data:/solr-data
+   - solr-data:/solr-data # needed by prepare script. Do not change it to solr as solr-data must have the correct rights before solr is started
   command: mongod --replSet "rs0"
   log_driver: fluentd
   log_opt:
@@ -265,7 +266,7 @@ maintenance:
   environment:
     - VIRTUAL_HOST=maintenance.testing.slidewiki.org
   links:
-    - mongodb
+    - mongodb # used to backup MongoDB
   volumes:
     - /data/maintenance:/maintenance
-    - files:/data/files
+    - files:/data/files # used to backup files
