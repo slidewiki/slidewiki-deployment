@@ -258,7 +258,7 @@ logger:
   privileged: true
 
 maintenance:
-  build: ../backup_scripts/
+  build: ../maintenance/
   restart: on-failure:5
   expose:
     - "80"
