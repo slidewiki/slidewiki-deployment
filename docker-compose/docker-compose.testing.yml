@@ -211,6 +211,7 @@ searchservice:
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=searchservice.testing.slidewiki.org
     - SERVICE_URL_USER=userservice.testing.slidewiki.org
+    - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
     - SOLR_CORE=swikcore
   log_driver: fluentd
   log_opt:
