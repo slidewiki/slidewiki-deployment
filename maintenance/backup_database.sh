@@ -12,4 +12,6 @@ echo "" >> /var/log/cron.log 2>&1
 
 echo "Backing up files" >> /var/log/cron.log 2>&1
 echo "" >> /var/log/cron.log 2>&1
+TOREMOVE=$(date --date="-5 days" +'%F')
+rm -f /maintenance/files/files.$TOREMOVE.tar.gz
 tar --gzip -cvf /maintenance/files/files.$BACKUP_DATE.tar.gz -C /data files >> /var/log/cron.log 2>&1
