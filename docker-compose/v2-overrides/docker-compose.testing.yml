@@ -13,18 +13,18 @@ services:
   platform:
     restart: always
     environment:
-      - VIRTUAL_HOST=experimental.slidewiki.org
-      - SERVICE_URL_DECK=http://deckservice.experimental.slidewiki.org
-      - SERVICE_URL_DISCUSSION=http://discussionservice.experimental.slidewiki.org
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice.experimental.slidewiki.org
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=http://userservice.experimental.slidewiki.org
-      - SERVICE_URL_IMPORT=http://importservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=http://fileservice.experimental.slidewiki.org
-      - SERVICE_URL_SEARCH=http://searchservice.experimental.slidewiki.org
-      - SERVICE_URL_IMAGE=http://imageservice.experimental.slidewiki.org
-      - SERVICE_URL_PDF=http://pdfservice.experimental.slidewiki.org
-      - SERVICE_VAR_IMPORT_HOST=importservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=testing.slidewiki.org
+      - SERVICE_URL_DECK=http://deckservice.testing.slidewiki.org
+      - SERVICE_URL_DISCUSSION=http://discussionservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=http://notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=http://userservice.testing.slidewiki.org
+      - SERVICE_URL_IMPORT=http://importservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=http://fileservice.testing.slidewiki.org
+      - SERVICE_URL_SEARCH=http://searchservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=http://imageservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=http://pdfservice.testing.slidewiki.org
+      - SERVICE_VAR_IMPORT_HOST=importservice.testing.slidewiki.org
     depends_on:
       - webserver
       - deckservice
@@ -47,9 +47,9 @@ services:
   deckservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=fileservice.experimental.slidewiki.org
-      - SERVICE_URL_IMAGE=imageservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=deckservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=fileservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=imageservice.testing.slidewiki.org
     depends_on:
       - fileservice
 #      - imageservice
@@ -64,9 +64,9 @@ services:
   activitiesservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=activitiesservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
+      - SERVICE_URL_USER=userservice.testing.slidewiki.org
     depends_on:
       - deckservice
       - userservice
@@ -81,11 +81,11 @@ services:
   discussionservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=discussionservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_ACTIVITIES=activitiesservice.experimental.slidewiki.org
-      - SERVICE_URL_NOTIFICATION=notificationservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=discussionservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=userservice.testing.slidewiki.org
     depends_on:
       - activitiesservice
       - notificationservice
@@ -101,8 +101,8 @@ services:
   notificationservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=notificationservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=userservice.testing.slidewiki.org
     depends_on:
       - userservice
       - mongodb
@@ -116,9 +116,9 @@ services:
   importservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=importservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=fileservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=importservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=fileservice.testing.slidewiki.org
     volumes:
       - files:/data/files
     depends_on:
@@ -135,8 +135,8 @@ services:
   imageservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=imageservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=fileservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=imageservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=fileservice.testing.slidewiki.org
     volumes:
       - files:/data/files
     depends_on:
@@ -153,7 +153,7 @@ services:
   userservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=userservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=userservice.testing.slidewiki.org
     depends_on:
       - mongodb
       - logger
@@ -166,10 +166,10 @@ services:
   pdfservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=pdfservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_PDF=pdfservice.experimental.slidewiki.org
-      - SERVICE_URL_PLATFORM=platform.experimental.slidewiki.org
+      - VIRTUAL_HOST=pdfservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=pdfservice.testing.slidewiki.org
+      - SERVICE_URL_PLATFORM=platform.testing.slidewiki.org
     depends_on:
       - deckservice
 #      - platform
@@ -183,7 +183,7 @@ services:
   fileservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=fileservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=fileservice.testing.slidewiki.org
     volumes:
       - files:/data/files
     depends_on:
@@ -198,8 +198,8 @@ services:
   searchservice:
     restart: always
     environment:
-      - VIRTUAL_HOST=searchservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
+      - VIRTUAL_HOST=searchservice.testing.slidewiki.org
+      - SERVICE_URL_USER=userservice.testing.slidewiki.org
     depends_on:
       - userservice
       - solr
@@ -256,7 +256,7 @@ services:
     expose:
       - "80"
     environment:
-      - VIRTUAL_HOST=maintenance.experimental.slidewiki.org
+      - VIRTUAL_HOST=maintenance.testing.slidewiki.org
     networks:
       - front-trier
       - back-trier

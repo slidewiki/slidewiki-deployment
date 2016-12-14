@@ -10,6 +10,7 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ../client_max_body_size.conf:/etc/nginx/conf.d/client_max_body_size.conf:ro
+      - ../htpasswd:/etc/nginx/htpasswd # Not tracked as part of this repo
 
   platform:
     image: slidewiki/platform
@@ -30,6 +31,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   activitiesservice:
     image: slidewiki/activitiesservice
@@ -41,6 +43,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   discussionservice:
     image: slidewiki/discussionservice
@@ -52,6 +55,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   notificationservice:
     image: slidewiki/notificationservice
@@ -63,6 +67,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   importservice:
     image: slidewiki/importservice
@@ -74,6 +79,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   imageservice:
     image: slidewiki/imageservice
@@ -85,6 +91,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   userservice:
     image: slidewiki/userservice
@@ -96,6 +103,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   pdfservice:
     image: slidewiki/pdfservice
@@ -115,6 +123,8 @@ services:
     environment:
       - APPLICATION_PORT=80
       - APPLICATION_PATH=/data/files
+      - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
 
   searchservice:
     image: slidewiki/searchservice
@@ -126,6 +136,7 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
       - SOLR_CORE=swikcore
 
   solr:

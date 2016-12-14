@@ -13,7 +13,7 @@ docker-compose -f docker-compose.yml -f $1 up -d mongodb
 sleep 10s # Wait for MongoDB to initialize
 
 docker exec $(docker ps -f name=mongodb* -q) mongo --eval 'config = { _id : "rs0", "members" : [ {_id : 0, "host" : "localhost:27017"} ] }; rs.initiate(config);'
-docker exec mongodb chown -R 8983:8983 /solr-data/
+docker exec $(docker ps -f name=mongodb* -q) chown -R 8983:8983 /solr-data/
 
 echo
 echo 'For further commands, use:'

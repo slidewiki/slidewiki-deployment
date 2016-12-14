@@ -1,7 +1,10 @@
 version: '2'
 services:
+  webserver:
+    restart: always
+
   platform:
-  #  build: /home/rmeissner/.git/slidewiki-platform/
+    restart: always
     environment:
       - VIRTUAL_HOST=platform.localhost
       - SERVICE_URL_DECK=http://deckservice
@@ -12,6 +15,8 @@ services:
       - SERVICE_URL_IMPORT=http://importservice
       - SERVICE_URL_FILE=http://fileservice
       - SERVICE_URL_SEARCH=http://searchservice
+      - SERVICE_URL_IMAGE=http://imageservice
+      - SERVICE_URL_PDF=http://pdfservice
       - SERVICE_VAR_IMPORT_HOST=importservice
     depends_on:
       - webserver
@@ -20,105 +25,131 @@ services:
       - discussionservice
       - notificationservice
       - importservice
-      - imageservice
       - userservice
       - pdfservice
       - fileservice
+      - searchservice
+      - imageservice
 
   deckservice:
-    depends_on:
-      - mongodb
-      - fileservice
-      - imageservice
+    restart: always
     environment:
       - VIRTUAL_HOST=deckservice.localhost
       - SERVICE_URL_FILE=fileservice
       - SERVICE_URL_IMAGE=imageservice
+    depends_on:
+      - fileservice
+#      - imageservice
+      - mongodb
 
   activitiesservice:
-    depends_on:
-      - mongodb
-      - deckservice
-      - userservice
+    restart: always
     environment:
       - VIRTUAL_HOST=activitiesservice.localhost
       - SERVICE_URL_DECK=deckservice
       - SERVICE_URL_USER=userservice
-
-  discussionservice:
     depends_on:
-      - mongodb
       - deckservice
       - userservice
-      - notificationservice
-      - activitiesservice
+      - mongodb
+
+  discussionservice:
+    restart: always
     environment:
       - VIRTUAL_HOST=discussionservice.localhost
       - SERVICE_URL_DECK=deckservice
-      - SERVICE_URL_USER=userservice
-      - SERVICE_URL_NOTIFICATION=notificationservice
       - SERVICE_URL_ACTIVITIES=activitiesservice
+      - SERVICE_URL_NOTIFICATION=notificationservice
+      - SERVICE_URL_USER=userservice
+    depends_on:
+      - activitiesservice
+      - notificationservice
+      - userservice
+      - mongodb
 
   notificationservice:
-    depends_on:
-      - mongodb
-      - userservice
+    restart: always
     environment:
       - VIRTUAL_HOST=notificationservice.localhost
       - SERVICE_URL_USER=userservice
+    depends_on:
+      - userservice
+      - mongodb
 
   importservice:
-    depends_on:
-      - mongodb
-      - deckservice
-      - fileservice
+    restart: always
     environment:
       - VIRTUAL_HOST=importservice.localhost
       - SERVICE_URL_DECK=deckservice
       - SERVICE_URL_FILE=fileservice
     volumes:
-      - ./images:/data/files/:rw
+      - ./images:/data/files
+    depends_on:
+      - deckservice
+      - fileservice
+      - mongodb
 
   imageservice:
-    depends_on:
-        - mongodb
+    restart: always
     environment:
-        - VIRTUAL_HOST=imageservice.localhost
+      - VIRTUAL_HOST=imageservice.localhost
+      - SERVICE_URL_FILE=fileservice
     volumes:
-      - ./images:/data/files/:rw
+      - ./images:/data/files
+    depends_on:
+      - importservice
+      - fileservice
+      - mongodb
 
   userservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=userservice
     depends_on:
       - mongodb
-    environment:
-      - VIRTUAL_HOST=userservice.localhost
 
   pdfservice:
+    restart: always
     environment:
       - VIRTUAL_HOST=pdfservice.localhost
+      - SERVICE_URL_DECK=deckservice
+      - SERVICE_URL_PDF=pdfservice
+      - SERVICE_URL_PLATFORM=platform
+    depends_on:
+      - deckservice
+#      - platform
 
   fileservice:
+    restart: always
     environment:
       - VIRTUAL_HOST=fileservice.localhost
     volumes:
-      - ./images:/data/files:ro
-
-  searchservice:
+      - ./images:/data/files
     depends_on:
       - mongodb
-      - solr
-      - userservice
+
+  searchservice:
+    restart: always
     environment:
       - VIRTUAL_HOST=searchservice.localhost
-      - SERVICE_URL_USER=http://userservice
+      - SERVICE_URL_USER=userservice
+    depends_on:
+      - userservice
+      - solr
+      - mongodb
 
   solr:
+    restart: always
     ports:
       - "8983:8983"
     volumes:
-      - ./solrserver-config/solr-config:/opt/solr/server/solr:rw
-      - ./solrserver-config/solr-data:/solr-data
+      - ../solrserver-config/solr-config:/opt/solr/server/solr
+      - ../solrserver-config/solr-data:/solr-data
+    depends_on:
+      - mongodb
 
   mongodb:
+    restart: always
     volumes:
-      - ./database:/data/db:rw
+      - ./database:/data/db
+      - ../solrserver-config/solr-data:/solr-data # needed by prepare script. Do not change it to solr as solr-data must have the correct rights before solr is started
