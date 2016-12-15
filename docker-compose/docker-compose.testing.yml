@@ -30,7 +30,7 @@ platform:
     - SERVICE_URL_IMPORT=http://importservice.testing.slidewiki.org
     - SERVICE_URL_FILE=http://fileservice.testing.slidewiki.org
     - SERVICE_URL_SEARCH=http://searchservice.testing.slidewiki.org
-    - SERVICE_URL_IMAGE=http://fileservice.testing.slidewiki.org
+    - SERVICE_URL_IMAGE=http://imageservice.testing.slidewiki.org
     - SERVICE_URL_PDF=http://pdfservice.testing.slidewiki.org
     - SERVICE_VAR_IMPORT_HOST=importservice.testing.slidewiki.org
   log_driver: fluentd
@@ -141,7 +141,7 @@ imageservice:
   environment:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
-    - VIRTUAL_HOST=importservice.testing.slidewiki.org
+    - VIRTUAL_HOST=imageservice.testing.slidewiki.org
     - SERVICE_URL_FILE=fileservice.testing.slidewiki.org
   volumes:
     - files:/data/files
@@ -211,8 +211,8 @@ searchservice:
     - APPLICATION_PORT=80
     - DATABASE_PORT=27017
     - VIRTUAL_HOST=searchservice.testing.slidewiki.org
-    - SERVICE_URL_USER=userservice.testing.slidewiki.org
-    - SERVICE_URL_DECK=deckservice.testing.slidewiki.org
+    - SERVICE_URL_USER=http://userservice.testing.slidewiki.org
+    - SERVICE_URL_DECK=http://deckservice.testing.slidewiki.org
     - SOLR_CORE=swikcore
   log_driver: fluentd
   log_opt:
@@ -251,12 +251,13 @@ mongodb:
     tag: "slidewiki.mongodb"
 
 logger:
-  image: slidewiki/logger
+  image: slidewiki/logger-test
   restart: on-failure:5
   ports:
     - "24224:24224"
   volumes:
     - /data/maintenance/log:/fluentd/log
+    - /etc/localtime:/etc/localtime:ro
   privileged: true
 
 maintenance:
