@@ -1,13 +1,14 @@
 # Execute the prepare script first!
 webserver:
-  image: jwilder/nginx-proxy
+  image: slidewiki/webproxy
   restart: always
   ports:
     - "80:80"
     - "443:443"
+  environment:
+    - BASENAME=testing.slidewiki.org
   volumes:
     - /var/run/docker.sock:/tmp/docker.sock:ro
-    - ./client_max_body_size.conf:/etc/nginx/conf.d/client_max_body_size.conf:ro
     - ./htpasswd:/etc/nginx/htpasswd # Not tracked as part of this repo
   log_driver: fluentd
   log_opt:
