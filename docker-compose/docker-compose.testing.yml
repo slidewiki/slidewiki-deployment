@@ -262,7 +262,7 @@ mongodb:
     tag: "slidewiki.mongodb"
 
 logger:
-  image: slidewiki/logger-test
+  image: slidewiki/logger
   restart: on-failure:5
   ports:
     - "24224:24224"
@@ -283,3 +283,15 @@ maintenance:
   volumes:
     - /data/maintenance:/maintenance
     - files:/data/files # used to backup files
+
+mongo-express:
+  image: mongo-express
+  restart: on-failure:5
+  expose:
+    - "8081"
+  links:
+    - mongodb
+  environment:
+    - VIRTUAL_HOST=mongoui.testing.slidewiki.org
+    - ME_CONFIG_MONGODB_SERVER=mongodb
+    - ME_CONFIG_MONGODB_PORT=27017
