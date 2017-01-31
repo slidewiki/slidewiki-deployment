@@ -154,6 +154,16 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=userservice.experimental.slidewiki.org
+      - SMTP_PORT=25
+      - SMTP_HOST=localhost
+  #    - SMTP_FROM=me@hostername.org
+  #    - SMTP_CLIENTNAME=
+  #    - APIKey=
+      - JWT_SERIAL=69aac7f95a9152cd4ae7667c80557c284e413d748cca4c5715b3f02020a5ae1b
+      - URL_PLATFORM=http://platform.experimental.slidewiki.org
+      - URL_ACTIVITIESSERVICE=http://activitiesservice.experimental.slidewiki.org
+    volumes:
+      - /data/slidewiki-deployment/docker-compose/providerConfig_experimental.json:/nodeApp/config.json:ro
     depends_on:
       - mongodb
       - logger

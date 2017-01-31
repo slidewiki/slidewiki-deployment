@@ -103,7 +103,17 @@ services:
     environment:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
-      - DATABASE_URL=mongodb
+      - VIRTUAL_HOST=userservice.localhost
+      - SMTP_PORT=25
+      - SMTP_HOST=localhost
+  #    - SMTP_FROM=me@hostername.org
+  #    - SMTP_CLIENTNAME=
+  #    - APIKey=
+      - JWT_SERIAL=69aac7f95a9152cd4ae7667c80557c284e413d748cca4c5715b3f02020a5ae1b
+      - URL_PLATFORM=http://platform.stable.slidewiki.org
+      - URL_ACTIVITIESSERVICE=http://activitiesservice.stable.slidewiki.org
+    volumes:
+      - /data/slidewiki-deployment/docker-compose/providerConfig_stable.json:/nodeApp/config.json:ro
 
   pdfservice:
     image: slidewiki/pdfservice
