@@ -2,6 +2,8 @@ version: '2'
 services:
   webserver:
     restart: always
+    environment:
+      - BASENAME=experimental.slidewiki.org
     depends_on:
       - logger
     logging:
@@ -14,29 +16,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=experimental.slidewiki.org
-      - SERVICE_URL_DECK=http://deckservice.experimental.slidewiki.org
-      - SERVICE_URL_DISCUSSION=http://discussionservice.experimental.slidewiki.org
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice.experimental.slidewiki.org
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=http://userservice.experimental.slidewiki.org
-      - SERVICE_URL_IMPORT=http://importservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=http://fileservice.experimental.slidewiki.org
-      - SERVICE_URL_SEARCH=http://searchservice.experimental.slidewiki.org
-      - SERVICE_URL_IMAGE=http://imageservice.experimental.slidewiki.org
-      - SERVICE_URL_PDF=http://pdfservice.experimental.slidewiki.org
-      - SERVICE_VAR_IMPORT_HOST=importservice.experimental.slidewiki.org
     depends_on:
-      - webserver
-      - deckservice
-      - activitiesservice
-      - discussionservice
-      - notificationservice
-      - importservice
-      - userservice
-      - pdfservice
-      - fileservice
-      - searchservice
-      - imageservice
       - logger
     logging:
       driver: fluentd
@@ -48,12 +28,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=fileservice.experimental.slidewiki.org
-      - SERVICE_URL_IMAGE=imageservice.experimental.slidewiki.org
     depends_on:
-      - fileservice
-#      - imageservice
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -65,12 +40,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=activitiesservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
     depends_on:
-      - deckservice
-      - userservice
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -82,15 +52,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=discussionservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_ACTIVITIES=activitiesservice.experimental.slidewiki.org
-      - SERVICE_URL_NOTIFICATION=notificationservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
     depends_on:
-      - activitiesservice
-      - notificationservice
-      - userservice
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -102,10 +64,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=notificationservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
     depends_on:
-      - userservice
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -117,14 +76,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=importservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=fileservice.experimental.slidewiki.org
     volumes:
       - files:/data/files
     depends_on:
-      - deckservice
-      - fileservice
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -136,13 +90,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=imageservice.experimental.slidewiki.org
-      - SERVICE_URL_FILE=fileservice.experimental.slidewiki.org
     volumes:
       - files:/data/files
     depends_on:
-      - importservice
-      - fileservice
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -154,18 +104,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=userservice.experimental.slidewiki.org
-      - SMTP_PORT=25
-      - SMTP_HOST=localhost
-  #    - SMTP_FROM=me@hostername.org
-  #    - SMTP_CLIENTNAME=
-  #    - APIKey=
-      - JWT_SERIAL=69aac7f95a9152cd4ae7667c80557c284e413d748cca4c5715b3f02020a5ae1b
-      - URL_PLATFORM=http://platform.experimental.slidewiki.org
-      - URL_ACTIVITIESSERVICE=http://activitiesservice.experimental.slidewiki.org
     volumes:
       - /data/slidewiki-deployment/docker-compose/providerConfig_experimental.json:/nodeApp/config.json:ro
     depends_on:
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -177,12 +118,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=pdfservice.experimental.slidewiki.org
-      - SERVICE_URL_DECK=deckservice.experimental.slidewiki.org
-      - SERVICE_URL_PDF=pdfservice.experimental.slidewiki.org
-      - SERVICE_URL_PLATFORM=platform.experimental.slidewiki.org
     depends_on:
-      - deckservice
-#      - platform
       - logger
     logging:
       driver: fluentd
@@ -197,7 +133,6 @@ services:
     volumes:
       - files:/data/files
     depends_on:
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -209,11 +144,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=searchservice.experimental.slidewiki.org
-      - SERVICE_URL_USER=userservice.experimental.slidewiki.org
     depends_on:
-      - userservice
-      - solr
-      - mongodb
       - logger
     logging:
       driver: fluentd
@@ -229,13 +160,24 @@ services:
       - ../solrserver-config/solr-config:/opt/solr/server/solr:rw
       - solr-data:/solr-data
     depends_on:
-      - mongodb
       - logger
     logging:
       driver: fluentd
       options:
         fluentd-address: "logger:24224"
         tag: "slidewiki.solr"
+
+  xapi:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=xapiservice.experimental.slidewiki.org
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "logger:24224"
+        tag: "slidewiki.xapi"
 
   mongodb:
     restart: always
