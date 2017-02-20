@@ -48,7 +48,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=userservice.localhost
-
+      - URL_PLATFORM=http://testing.slidewiki.org
   pdfservice:
     restart: always
     environment:
