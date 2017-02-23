@@ -7,12 +7,16 @@ if [ $# -lt 1 ] ; then
   exit
 fi
 
+mkdir -p /data/maintenance/log
+chmod -R 777 /data/maintenance/log
+
 chown -R 8983:8983 ../solrserver-config/solr-*
 docker-compose -f docker-compose.yml -f $1 up -d mongodb
 
 sleep 10s # Wait for MongoDB to initialize
 
 docker exec $(docker ps -f name=mongodb* -q) mongo --eval 'config = { _id : "rs0", "members" : [ {_id : 0, "host" : "localhost:27017"} ] }; rs.initiate(config);'
+
 docker exec $(docker ps -f name=mongodb* -q) chown -R 8983:8983 /solr-data/
 
 echo
