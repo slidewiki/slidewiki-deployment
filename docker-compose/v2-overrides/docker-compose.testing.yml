@@ -225,6 +225,7 @@ services:
       - VIRTUAL_HOST=maintenance.testing.slidewiki.org
       - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+      - LETSENCRYPT_TEST=true
     networks:
       - front-trier
       - back-trier
