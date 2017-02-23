@@ -4,6 +4,10 @@ services:
     restart: always
     environment:
       - BASENAME=testing.slidewiki.org
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
     depends_on:
       - logger
     logging:
@@ -11,6 +15,14 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.webserver"
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+    volumes_from:
+      - webserver
 
   platform:
     restart: always
@@ -211,6 +223,8 @@ services:
       - "80"
     environment:
       - VIRTUAL_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     networks:
       - front-trier
       - back-trier
@@ -225,3 +239,4 @@ volumes:
   mongo-data: {}
   solr-data: {}
   files: {}
+  certs: {}
