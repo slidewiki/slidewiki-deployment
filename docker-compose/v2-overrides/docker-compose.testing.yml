@@ -167,17 +167,17 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.solr"
 
-  xapi:
-    restart: always
-    environment:
-      - VIRTUAL_HOST=xapiservice.testing.slidewiki.org
-    depends_on:
-      - logger
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "localhost:24224"
-        tag: "slidewiki.xapi"
+  #xapi:
+  #  restart: always
+  #  environment:
+  #    - VIRTUAL_HOST=xapiservice.testing.slidewiki.org
+  #  depends_on:
+  #    - logger
+  #  logging:
+  #    driver: fluentd
+  #    options:
+  #      fluentd-address: "localhost:24224"
+  #      tag: "slidewiki.xapi"
 
   mongodb:
     restart: always

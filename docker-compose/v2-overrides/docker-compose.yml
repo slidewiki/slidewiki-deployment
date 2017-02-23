@@ -234,14 +234,14 @@ services:
     depends_on:
       - mongodb
 
-  xapi:
-    image: slidewiki/xapi-service
-    expose:
-      - "80"
-    networks:
-      - front-trier
-    environment:
-      - APPLICATION_PORT=80
+  #xapi:
+  #  image: slidewiki/xapi-service
+  #  expose:
+  #    - "80"
+  #  networks:
+  #    - front-trier
+  #  environment:
+  #    - APPLICATION_PORT=80
 
   mongodb:
     image: mongo
