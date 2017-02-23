@@ -117,7 +117,7 @@ services:
     environment:
       - VIRTUAL_HOST=userservice.testing.slidewiki.org
     volumes:
-      - /data/slidewiki-deployment/docker-compose/providerConfig_testing.json:/nodeApp/config.json:ro
+      - /data/userservice/providerConfig_testing.json:/nodeApp/config.json:ro
     depends_on:
       - logger
     logging:

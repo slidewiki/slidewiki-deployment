@@ -7,6 +7,8 @@ if [ $# -lt 1 ] ; then
   exit
 fi
 
+
+## Preparations for the logger container
 mkdir -p /data/maintenance/log
 chmod -R 777 /data/maintenance/log
 
@@ -16,8 +18,17 @@ docker-compose -f docker-compose.yml -f $1 up -d mongodb
 sleep 10s # Wait for MongoDB to initialize
 
 docker exec $(docker ps -f name=mongodb* -q) mongo --eval 'config = { _id : "rs0", "members" : [ {_id : 0, "host" : "localhost:27017"} ] }; rs.initiate(config);'
-
 docker exec $(docker ps -f name=mongodb* -q) chown -R 8983:8983 /solr-data/
+
+##Preparation for the userservice
+if [ -d ./userservice ]; then
+  cp -r userservice /data/
+else
+  echo "/////////////////////"
+  echo "Remember to copy the config files for the userservice"
+  echo "in /data/maintenance/userservice"
+  mkdir -p /data/userservice
+fi
 
 echo
 echo 'For further commands, use:'
