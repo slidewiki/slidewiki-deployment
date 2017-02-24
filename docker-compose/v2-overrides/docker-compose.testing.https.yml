@@ -28,6 +28,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+
     depends_on:
       - logger
     logging:
@@ -40,6 +43,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=deckservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     depends_on:
       - logger
     logging:
@@ -52,6 +57,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=activitiesservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     depends_on:
       - logger
     logging:
@@ -64,6 +71,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=discussionservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     depends_on:
       - logger
     logging:
@@ -76,6 +85,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=notificationservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     depends_on:
       - logger
     logging:
@@ -88,6 +99,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=importservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     volumes:
       - files:/data/files
     depends_on:
@@ -102,6 +115,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=imageservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     volumes:
       - files:/data/files
     depends_on:
@@ -116,6 +131,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=userservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     depends_on:
       - logger
     logging:
@@ -128,6 +145,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=pdfservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     depends_on:
       - logger
     logging:
@@ -140,6 +159,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=fileservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     volumes:
       - files:/data/files
     depends_on:
@@ -154,6 +175,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=searchservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
     depends_on:
       - logger
     logging:
@@ -181,6 +204,8 @@ services:
   #  restart: always
   #  environment:
   #    - VIRTUAL_HOST=xapiservice.testing.slidewiki.org
+  #    - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+  #    - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
   #  depends_on:
   #    - logger
   #  logging:
@@ -221,6 +246,9 @@ services:
       - "80"
     environment:
       - VIRTUAL_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+      - LETSENCRYPT_TEST=true
     networks:
       - front-trier
       - back-trier

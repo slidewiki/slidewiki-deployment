@@ -172,7 +172,7 @@ services:
       - URL_PLATFORM=http://platform
       - SERVICE_URL_ACTIVITIES=http://activitiesservice
     volumes:
-      - /data/slidewiki-deployment/docker-compose/providerConfig_stable.json:/nodeApp/config.json:ro
+      - /data/userservice/providerConfig_testing.json:/nodeApp/config.json
     depends_on:
   #    - platform
   #    - activitiesservice
@@ -191,7 +191,6 @@ services:
       - SERVICE_URL_PLATFORM=http://platform
     depends_on:
       - deckservice
-#      - platform
 
   fileservice:
     image: slidewiki/fileservice
