@@ -13,7 +13,7 @@ mkdir -p /data/maintenance/log
 chmod -R 777 /data/maintenance/log
 
 chown -R 8983:8983 ../solrserver-config/solr-*
-docker-compose -f docker-compose.yml -f $1 up -d mongodb
+docker-compose -f docker-compose.yml -f $1 up -d mongodb solr
 
 sleep 10s # Wait for MongoDB to initialize
 
