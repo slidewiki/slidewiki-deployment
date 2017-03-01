@@ -7,7 +7,6 @@ if [ $# -lt 1 ] ; then
   exit
 fi
 
-
 ## Preparations for the logger container
 mkdir -p /data/maintenance/log
 chmod -R 777 /data/maintenance/log
@@ -26,7 +25,7 @@ if [ -d ./userservice ]; then
 else
   echo "/////////////////////"
   echo "Remember to copy the config files for the userservice"
-  echo "in /data/maintenance/userservice"
+  echo "in /data/userservice"
   mkdir -p /data/userservice
 fi
 
@@ -34,3 +33,5 @@ echo
 echo 'For further commands, use:'
 echo
 echo "docker-compose -f docker-compose.yml -f $1 [options] [COMMAND] [ARGS]"
+echo
+echo "Execute next: docker-compose -f docker-compose.yml -f $1 up -d"
