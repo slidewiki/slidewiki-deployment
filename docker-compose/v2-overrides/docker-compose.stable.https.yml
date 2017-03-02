@@ -1,0 +1,277 @@
+version: '2'
+services:
+  webserver:
+    restart: always
+    environment:
+      - BASENAME=slidewiki.org
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.webserver"
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+    volumes_from:
+      - webserver
+
+  platform:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=slidewiki.org
+#      - LETSENCRYPT_HOST=slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.platform"
+
+  deckservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=deckservice.slidewiki.org
+#      - LETSENCRYPT_HOST=deckservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.deckservice"
+
+  activitiesservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=activitiesservice.slidewiki.org
+#      - LETSENCRYPT_HOST=activitiesservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.activitiesservice"
+
+  discussionservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=discussionservice.slidewiki.org
+#      - LETSENCRYPT_HOST=discussionservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.discussionservice"
+
+  notificationservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=notificationservice.slidewiki.org
+#      - LETSENCRYPT_HOST=notificationservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.notificationservice"
+
+  importservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=importservice.slidewiki.org
+#      - LETSENCRYPT_HOST=importservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    volumes:
+      - files:/data/files
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.importservice"
+
+  imageservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=imageservice.slidewiki.org
+#      - LETSENCRYPT_HOST=imageservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    volumes:
+      - files:/data/files
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.imageservice"
+
+  userservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=userservice.slidewiki.org
+#      - LETSENCRYPT_HOST=userservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.userservice"
+
+  pdfservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=pdfservice.slidewiki.org
+#      - LETSENCRYPT_HOST=pdfservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.pdfservice"
+
+  fileservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=fileservice.slidewiki.org
+#      - LETSENCRYPT_HOST=fileservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    volumes:
+      - files:/data/files
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.fileservice"
+
+  searchservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=searchservice.slidewiki.org
+#      - LETSENCRYPT_HOST=searchservice.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.searchservice"
+
+  solr:
+    restart: always
+    ports:
+      - "8983:8983"
+    volumes:
+      - ../solrserver-config/solr-config:/opt/solr/server/solr:rw
+      - solr-data:/solr-data
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.solr"
+
+  #xapi:
+  #  restart: always
+  #  environment:
+  #    - VIRTUAL_HOST=xapiservice.slidewiki.org
+  #    - LETSENCRYPT_HOST=xapiservice.slidewiki.org
+  #    - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+  #    - LETSENCRYPT_TEST=true
+  #  depends_on:
+  #    - logger
+  #  logging:
+  #    driver: fluentd
+  #    options:
+  #      fluentd-address: "localhost:24224"
+  #      tag: "slidewiki.xapi"
+
+  mongodb:
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+      - solr-data:/solr-data # needed by prepare script. Do not change it to solr as solr-data must have the correct rights before solr is started
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.mongodb"
+
+  logger:
+    image: slidewiki/logger
+    restart: always
+    volumes:
+      - /data/maintenance/log:/fluentd/log
+    ports:
+      - "24224:24224"
+    networks:
+      - front-trier
+      - back-trier
+    privileged: true
+
+  maintenance:
+    build: ../../maintenance/
+    restart: always
+    expose:
+      - "80"
+    environment:
+      - VIRTUAL_HOST=maintenance.slidewiki.org
+#      - LETSENCRYPT_HOST=maintenance.slidewiki.org
+#      - LETSENCRYPT_EMAIL=paul.baptista@iais-extern.fraunhofer.de
+#      - LETSENCRYPT_TEST=true
+    networks:
+      - front-trier
+      - back-trier
+    volumes:
+      - /data/maintenance:/maintenance
+      - files:/data/files # used to backup files
+    depends_on:
+      - mongodb
+      - logger
+
+volumes:
+  mongo-data: {}
+  solr-data: {}
+  files: {}
+  certs: {}
