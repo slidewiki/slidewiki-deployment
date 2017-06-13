@@ -11,13 +11,11 @@ fi
 mkdir -p /data/maintenance/log
 chmod -R 777 /data/maintenance/log
 
-chown -R 8983:8983 solrserver-config/solr-*
-#docker-compose -f $1 pull
-docker-compose -f $1 up -d logger
-docker-compose -f $1 up -d mongodb
-sleep 10s
+docker-compose -f docker-compose.yml -f $1 up -d mongodb solr
+
+sleep 10s # Wait for MongoDB to initialize
+
 docker exec $(docker ps -f name=mongodb* -q) mongo --eval 'config = { _id : "rs0", "members" : [ {_id : 0, "host" : "localhost:27017"} ] }; rs.initiate(config);'
-docker exec $(docker ps -f name=mongodb* -q) chown -R 8983:8983 /solr-data/
 
 ##Preparation for the userservice
 if [ -d ./userservice ]; then
@@ -32,4 +30,6 @@ fi
 echo
 echo 'For further commands, use:'
 echo
-echo "docker-compose -f $1 [options] [COMMAND] [ARGS]"
+echo "docker-compose -f docker-compose.yml -f $1 [options] [COMMAND] [ARGS]"
+echo
+echo "Execute next: docker-compose -f docker-compose.yml -f $1 up -d"

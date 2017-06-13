@@ -28,6 +28,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=testing.slidewiki.org
+      - LETSENCRYPT_HOST=testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -40,6 +43,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=deckservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=deckservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -48,10 +54,30 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.deckservice"
 
+  unoconvservice:
+    restart: always
+    environment:
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=unoconvservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=unoconvservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
+      - PAYLOAD_MAX_SIZE=314572800
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.unoconv"
+
+
+
   activitiesservice:
     restart: always
     environment:
       - VIRTUAL_HOST=activitiesservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=activitiesservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -64,6 +90,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=discussionservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=discussionservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -76,6 +105,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=notificationservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=notificationservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -88,6 +120,10 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=importservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=importservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+      - SERVICE_HOST_UNOCONV=unoconvservice.testing.slidewiki.org
+#      - LETSENCRYPT_TEST=true
     volumes:
       - files:/data/files
     depends_on:
@@ -98,24 +134,13 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.importservice"
 
-  imageservice:
-    restart: always
-    environment:
-      - VIRTUAL_HOST=imageservice.testing.slidewiki.org
-    volumes:
-      - files:/data/files
-    depends_on:
-      - logger
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "localhost:24224"
-        tag: "slidewiki.imageservice"
-
   userservice:
     restart: always
     environment:
       - VIRTUAL_HOST=userservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=userservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -128,6 +153,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=pdfservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=pdfservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -140,6 +168,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=fileservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=fileservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     volumes:
       - files:/data/files
     depends_on:
@@ -154,6 +185,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=searchservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=searchservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
     logging:
@@ -164,11 +198,13 @@ services:
 
   solr:
     restart: always
-    ports:
-      - "8983:8983"
     volumes:
-      - ../solrserver-config/solr-config:/opt/solr/server/solr:rw
       - solr-data:/solr-data
+    environment:
+      - VIRTUAL_HOST=solr.testing.slidewiki.org
+      - VIRTUAL_PORT=8983
+      - LETSENCRYPT_HOST=solr.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
     depends_on:
       - logger
     logging:
@@ -181,6 +217,9 @@ services:
   #  restart: always
   #  environment:
   #    - VIRTUAL_HOST=xapiservice.testing.slidewiki.org
+  #    - LETSENCRYPT_HOST=xapiservice.testing.slidewiki.org
+  #    - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+  #    - LETSENCRYPT_TEST=true
   #  depends_on:
   #    - logger
   #  logging:
@@ -202,6 +241,32 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.mongodb"
 
+  tagservice:
+    restart: always
+      - VIRTUAL_HOST=tagservice.testing.slidewiki.org
+      - LETSENCRYPT_HOST=tagservice.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.tagservice"
+ 
+  nlpstore:
+    restart: always
+      - VIRTUAL_HOST=nlpstore.testing.slidewiki.org
+      - LETSENCRYPT_HOST=nlpstore.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpstore"
+ 
   logger:
     image: slidewiki/logger
     restart: always
@@ -213,7 +278,7 @@ services:
       - front-trier
       - back-trier
     privileged: true
-
+ 
   maintenance:
     build: ../../maintenance/
     restart: always
@@ -221,6 +286,9 @@ services:
       - "80"
     environment:
       - VIRTUAL_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_HOST=maintenance.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+#      - LETSENCRYPT_TEST=true
     networks:
       - front-trier
       - back-trier
@@ -230,6 +298,7 @@ services:
     depends_on:
       - mongodb
       - logger
+
 
 volumes:
   mongo-data: {}

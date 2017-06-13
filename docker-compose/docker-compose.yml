@@ -13,8 +13,8 @@ services:
       - ../htpasswd:/etc/nginx/htpasswd # Not tracked as part of this repo
 
   platform:
-    #image: slidewiki/platform
-    build: ~/slidewiki/slidewiki-platform
+    image: slidewiki/platform
+    #build: ~/slidewiki/slidewiki-platform
     expose:
       - "80"
     environment:
@@ -26,10 +26,12 @@ services:
       - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
       - SERVICE_URL_IMPORT=https://importservice.testing.slidewiki.org
       - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=https://imageservice.stable.slidewiki.org
       - SERVICE_URL_SEARCH=https://searchservice.testing.slidewiki.org
-      - SERVICE_URL_IMAGE=https://imageservice.testing.slidewiki.org
       - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
       - SERVICE_VAR_IMPORT_HOST=importservice.testing.slidewiki.org
+      - SERVICE_PROTOCOL_IMPORT=https
+      - SERVICE_PORT_IMPORT=443
     networks:
       - front-trier
     depends_on:
@@ -43,10 +45,11 @@ services:
       - pdfservice
       - fileservice
       - searchservice
-      - imageservice
+    #  - imageservice
 
   deckservice:
-    build: ~/slidewiki/deck-service
+    image: slidewiki/deckservice
+    #build: ~/slidewiki/deck-service
     expose:
       - "80"
     networks:
@@ -57,14 +60,22 @@ services:
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
       - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
-      - SERVICE_URL_IMAGE=https://imageservice.testing.slidewiki.org
     depends_on:
       - fileservice
-#      - imageservice
       - mongodb
 
+  unoconvservice:
+    image: zrrrzzt/docker-unoconv-webservice
+    expose:
+      - "3000"
+    networks:
+      - front-trier
+      - back-trier
+ 
+
   activitiesservice:
-    build: ~/slidewiki/activities-service
+    image: slidewiki/activitiesservice
+    #build: ~/slidewiki/activities-service
     expose:
       - "80"
     networks:
@@ -82,7 +93,8 @@ services:
       - mongodb
 
   discussionservice:
-    build: ~/slidewiki/discussion-service
+    image: slidewiki/discussionservice
+    #build: ~/slidewiki/discussion-service
     expose:
       - "80"
     networks:
@@ -103,7 +115,8 @@ services:
       - mongodb
 
   notificationservice:
-    build: ~/slidewiki/notification-service
+    image: slidewiki/notificationservice
+    #build: ~/slidewiki/notification-service
     expose:
       - "80"
     networks:
@@ -119,7 +132,8 @@ services:
       - mongodb
 
   importservice:
-    build: ~/slidewiki/import-service
+    image: slidewiki/importservice
+    #build: ~/slidewiki/import-service
     expose:
       - "80"
     networks:
@@ -136,25 +150,9 @@ services:
       - fileservice
       - mongodb
 
-  imageservice:
-    build: ~/slidewiki/image-service
-    expose:
-      - "80"
-    networks:
-      - front-trier
-      - back-trier
-    environment:
-      - APPLICATION_PORT=80
-      - DATABASE_PORT=27017
-      - DATABASE_URL=mongodb
-      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
-    depends_on:
-      - importservice
-      - fileservice
-      - mongodb
-
   userservice:
-    build: ~/slidewiki/user-service
+    image: slidewiki/userservice
+    #build: ~/slidewiki/user-service
     expose:
       - "80"
     networks:
@@ -173,14 +171,15 @@ services:
       - URL_PLATFORM=https://testing.slidewiki.org
       - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
     volumes:
-      - /data/userservice/providerConfig_testing.json:/nodeApp/config.json
+      - /data/userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
   #    - platform
   #    - activitiesservice
       - mongodb
 
   pdfservice:
-    build: ~/slidewiki/PDF-Service
+    image: slidewiki/pdfservice
+    #build: ~/slidewiki/PDF-Service
     expose:
       - "80"
     networks:
@@ -194,7 +193,7 @@ services:
       - deckservice
 
   fileservice:
-    build: ~/slidewiki/file-service
+    image: slidewiki/fileservice
     expose:
       - "80"
     networks:
@@ -208,7 +207,8 @@ services:
       - mongodb
 
   searchservice:
-    build: ~/slidewiki/search-service
+    image: slidewiki/searchservice
+    #build: ~/slidewiki/search-service
     expose:
       - "80"
     networks:
@@ -228,11 +228,12 @@ services:
       - mongodb
 
   solr:
-    image: solr
+    image: slidewiki/solr
     container_name: solr
     expose:
       - "8983"
     networks:
+      - front-trier
       - back-trier
     depends_on:
       - mongodb
@@ -251,11 +252,63 @@ services:
     container_name: mongodb
     expose:
         - "27017"
+#    ports:
+#        - "27017:2007"
     networks:
       - back-trier
     volumes:
       - database:/data/db
-    command: mongod --replSet "rs0"
+    command: mongod
+
+  tagservice:
+    image: slidewiki/tagservice
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_DISCUSSION=https://discussionservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
+      - SERVICE_URL_SEARCH=https://searchservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=https://imageservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
+      - SERVICE_URL_IMPORT=https://importservice.testing.slidewiki.org
+    depends_on:
+      - mongodb
+
+  nlpstore:
+    image: slidewiki/nlpstore
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_DISCUSSION=https://discussionservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
+      - SERVICE_URL_SEARCH=https://searchservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=https://imageservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
+      - SERVICE_URL_IMPORT=https://importservice.testing.slidewiki.org
+    depends_on:
+      - mongodb
+
+
 
 networks:
   front-trier: {}
