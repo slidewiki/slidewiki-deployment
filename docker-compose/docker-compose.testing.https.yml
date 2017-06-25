@@ -22,7 +22,6 @@ services:
     privileged: true
 
   mongodb:
-    restart: always
     volumes:
       - mongo-data:/data/db
     depends_on:
@@ -34,7 +33,6 @@ services:
         tag: "slidewiki.mongodb"
 
   solr:
-    restart: always
     volumes:
       - solr-data:/solr-data
     environment:
@@ -51,6 +49,7 @@ services:
         tag: "slidewiki.solr"
 
   letsencrypt:
+    restart: always
     image: jrcs/letsencrypt-nginx-proxy-companion
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -59,7 +58,6 @@ services:
       - webserver
 
   webserver:
-    restart: always
     environment:
       - BASENAME=testing.slidewiki.org
     volumes:
@@ -76,7 +74,6 @@ services:
 
   platform:
     build: /opt/slidewiki/slidewiki-platform
-    restart: always
     environment:
       - VIRTUAL_HOST=testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
@@ -108,7 +105,6 @@ services:
 
   deckservice:
     build: /opt/slidewiki/deck-service
-    restart: always
     environment:
       - VIRTUAL_HOST=deckservice.testing.slidewiki.org
       - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
@@ -142,7 +138,6 @@ services:
 
   activitiesservice:
     build: /opt/slidewiki/activities-service
-    restart: always
     environment:
       - VIRTUAL_HOST=activitiesservice.testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
@@ -160,7 +155,6 @@ services:
 
   discussionservice:
     build: /opt/slidewiki/discussion-service
-    restart: always
     environment:
       - VIRTUAL_HOST=discussionservice.testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
@@ -180,7 +174,6 @@ services:
 
   notificationservice:
     build: /opt/slidewiki/notification-service
-    restart: always
     environment:
       - VIRTUAL_HOST=notificationservice.testing.slidewiki.org
       - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
@@ -197,7 +190,6 @@ services:
 
   importservice:
     build: /opt/slidewiki/import-service
-    restart: always
     environment:
       - VIRTUAL_HOST=importservice.testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
@@ -218,7 +210,6 @@ services:
 
   userservice:
     build: /opt/slidewiki/user-service
-    restart: always
     environment:
       - VIRTUAL_HOST=userservice.testing.slidewiki.org
       - URL_PLATFORM=https://testing.slidewiki.org
@@ -244,7 +235,6 @@ services:
 
   pdfservice:
     build: /opt/slidewiki/PDF-Service
-    restart: always
     environment:
       - VIRTUAL_HOST=pdfservice.testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
@@ -263,7 +253,6 @@ services:
 
   fileservice:
     build: /opt/slidewiki/file-service
-    restart: always
     environment:
       - VIRTUAL_HOST=fileservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=fileservice.testing.slidewiki.org
@@ -281,7 +270,6 @@ services:
 
   searchservice:
     build: /opt/slidewiki/search-service
-    restart: always
     environment:
       - VIRTUAL_HOST=searchservice.testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
@@ -298,7 +286,6 @@ services:
         tag: "slidewiki.searchservice"
 
   #xapi:
-  #  restart: always
   #  environment:
   #    - VIRTUAL_HOST=xapiservice.testing.slidewiki.org
   #    - LETSENCRYPT_HOST=xapiservice.testing.slidewiki.org
@@ -314,7 +301,6 @@ services:
 
   tagservice:
     build: /opt/slidewiki/tag-service
-    restart: always
     environment:
       - VIRTUAL_HOST=tagservice.testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
@@ -339,7 +325,6 @@ services:
 
   nlpstore:
     build: /opt/slidewiki/nlp-store-service
-    restart: always
     environment:
       - VIRTUAL_HOST=nlpstore.testing.slidewiki.org
       - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
