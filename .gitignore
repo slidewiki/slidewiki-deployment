@@ -40,4 +40,5 @@ jspm_packages
 certs
 database
 docker-compose/htpasswd
+docker-compose/userservice
 providerConfig*
