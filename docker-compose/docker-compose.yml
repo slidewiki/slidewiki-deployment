@@ -13,8 +13,8 @@ services:
       - ../htpasswd:/etc/nginx/htpasswd # Not tracked as part of this repo
 
   platform:
-    image: slidewiki/platform
-    #build: ~/slidewiki/slidewiki-platform
+    #image: slidewiki/platform
+    build: /opt/slidewiki/slidewiki-platform
     expose:
       - "80"
     environment:
@@ -29,6 +29,7 @@ services:
       - SERVICE_URL_IMAGE=https://imageservice.stable.slidewiki.org
       - SERVICE_URL_SEARCH=https://searchservice.testing.slidewiki.org
       - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
+      - SERVICE_URL_TAG=https://tagservice.testing.slidewiki.org
       - SERVICE_VAR_IMPORT_HOST=importservice.testing.slidewiki.org
       - SERVICE_PROTOCOL_IMPORT=https
       - SERVICE_PORT_IMPORT=443
@@ -45,11 +46,12 @@ services:
       - pdfservice
       - fileservice
       - searchservice
+      - tagservice
     #  - imageservice
 
   deckservice:
-    image: slidewiki/deckservice
-    #build: ~/slidewiki/deck-service
+    #image: slidewiki/deckservice
+    build: /opt/slidewiki/deck-service
     expose:
       - "80"
     networks:
@@ -74,8 +76,8 @@ services:
  
 
   activitiesservice:
-    image: slidewiki/activitiesservice
-    #build: ~/slidewiki/activities-service
+    #image: slidewiki/activitiesservice
+    build: /opt/slidewiki/activities-service
     expose:
       - "80"
     networks:
@@ -93,8 +95,8 @@ services:
       - mongodb
 
   discussionservice:
-    image: slidewiki/discussionservice
-    #build: ~/slidewiki/discussion-service
+    #image: slidewiki/discussionservice
+    build: /opt/slidewiki/discussion-service
     expose:
       - "80"
     networks:
@@ -115,8 +117,8 @@ services:
       - mongodb
 
   notificationservice:
-    image: slidewiki/notificationservice
-    #build: ~/slidewiki/notification-service
+    #image: slidewiki/notificationservice
+    build: /opt/slidewiki/notification-service
     expose:
       - "80"
     networks:
@@ -132,8 +134,8 @@ services:
       - mongodb
 
   importservice:
-    image: slidewiki/importservice
-    #build: ~/slidewiki/import-service
+    #image: slidewiki/importservice
+    build: /opt/slidewiki/import-service
     expose:
       - "80"
     networks:
@@ -151,8 +153,8 @@ services:
       - mongodb
 
   userservice:
-    image: slidewiki/userservice
-    #build: ~/slidewiki/user-service
+    #image: slidewiki/userservice
+    build: /opt/slidewiki/user-service
     expose:
       - "80"
     networks:
@@ -178,8 +180,8 @@ services:
       - mongodb
 
   pdfservice:
-    image: slidewiki/pdfservice
-    #build: ~/slidewiki/PDF-Service
+    #image: slidewiki/pdfservice
+    build: /opt/slidewiki/PDF-Service
     expose:
       - "80"
     networks:
@@ -193,11 +195,13 @@ services:
       - deckservice
 
   fileservice:
-    image: slidewiki/fileservice
+    # image: slidewiki/fileservice
+    build: /opt/slidewiki/file-service
     expose:
       - "80"
     networks:
       - front-trier
+      - back-trier
     environment:
       - APPLICATION_PORT=80
       - APPLICATION_PATH=/data/files
@@ -207,8 +211,8 @@ services:
       - mongodb
 
   searchservice:
-    image: slidewiki/searchservice
-    #build: ~/slidewiki/search-service
+    #image: slidewiki/searchservice
+    build: /opt/slidewiki/search-service
     expose:
       - "80"
     networks:
@@ -248,7 +252,7 @@ services:
   #    - APPLICATION_PORT=80
 
   mongodb:
-    image: mongo
+    image: mongo:3.4
     container_name: mongodb
     expose:
         - "27017"
@@ -258,10 +262,11 @@ services:
       - back-trier
     volumes:
       - database:/data/db
-    command: mongod
+    command: mongod --replSet "rs0"
 
   tagservice:
-    image: slidewiki/tagservice
+    #iimage: slidewiki/tagservice
+    build: /opt/slidewiki/tag-service
     expose:
       - "80"
     networks:
@@ -285,7 +290,8 @@ services:
       - mongodb
 
   nlpstore:
-    image: slidewiki/nlpstore
+    #image: slidewiki/nlpstore
+    build: /opt/slidewiki/nlp-store-service
     expose:
       - "80"
     networks:

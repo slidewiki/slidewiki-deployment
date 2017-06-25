@@ -30,6 +30,8 @@ services:
       - VIRTUAL_HOST=testing.slidewiki.org
       - LETSENCRYPT_HOST=testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+      - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=6LdNLyYTAAAAAFMC0J_zuVI1b9lXWZjPH6WLe-vJ
+      - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=6LdNLyYTAAAAAINDsVZRKG_E3l3Dvpp5sKboR1ET
 #      - LETSENCRYPT_TEST=true
     depends_on:
       - logger
@@ -63,6 +65,8 @@ services:
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
       - PAYLOAD_MAX_SIZE=314572800
+    depends_on:
+      - logger
     logging:
       driver: fluentd
       options:
@@ -232,7 +236,6 @@ services:
     restart: always
     volumes:
       - mongo-data:/data/db
-      - solr-data:/solr-data # needed by prepare script. Do not change it to solr as solr-data must have the correct rights before solr is started
     depends_on:
       - logger
     logging:
@@ -243,6 +246,7 @@ services:
 
   tagservice:
     restart: always
+    environment:
       - VIRTUAL_HOST=tagservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=tagservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
@@ -256,6 +260,7 @@ services:
  
   nlpstore:
     restart: always
+    environment:
       - VIRTUAL_HOST=nlpstore.testing.slidewiki.org
       - LETSENCRYPT_HOST=nlpstore.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
