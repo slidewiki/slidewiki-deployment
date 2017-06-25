@@ -30,7 +30,7 @@ services:
       - VIRTUAL_HOST=testing.slidewiki.org
       - LETSENCRYPT_HOST=testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
-      - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=PRIVATE_KEY
+      - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=PRIVTE_KEY
       - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=PUBLIC_KEY
 #      - LETSENCRYPT_TEST=true
     depends_on:
