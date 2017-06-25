@@ -1,5 +1,63 @@
 version: '2'
+
+volumes:
+
+  mongo-data: {}
+  solr-data: {}
+  files: {}
+  certs: {}
+
 services:
+
+  logger:
+    image: slidewiki/logger
+    restart: always
+    volumes:
+      - /data/maintenance/log:/fluentd/log
+    ports:
+      - "24224:24224"
+    networks:
+      - front-trier
+      - back-trier
+    privileged: true
+
+  mongodb:
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.mongodb"
+
+  solr:
+    restart: always
+    volumes:
+      - solr-data:/solr-data
+    environment:
+      - VIRTUAL_HOST=solr.testing.slidewiki.org
+      - VIRTUAL_PORT=8983
+      - LETSENCRYPT_HOST=solr.testing.slidewiki.org
+      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.solr"
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+    volumes_from:
+      - webserver
+
   webserver:
     restart: always
     environment:
@@ -16,15 +74,8 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.webserver"
 
-  letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - certs:/etc/nginx/certs:rw
-    volumes_from:
-      - webserver
-
   platform:
+    build: /opt/slidewiki/slidewiki-platform
     restart: always
     environment:
       - VIRTUAL_HOST=testing.slidewiki.org
@@ -42,6 +93,7 @@ services:
         tag: "slidewiki.platform"
 
   deckservice:
+    build: /opt/slidewiki/deck-service
     restart: always
     environment:
       - VIRTUAL_HOST=deckservice.testing.slidewiki.org
@@ -76,6 +128,7 @@ services:
 
 
   activitiesservice:
+    build: /opt/slidewiki/activities-service
     restart: always
     environment:
       - VIRTUAL_HOST=activitiesservice.testing.slidewiki.org
@@ -91,6 +144,7 @@ services:
         tag: "slidewiki.activitiesservice"
 
   discussionservice:
+    build: /opt/slidewiki/discussion-service
     restart: always
     environment:
       - VIRTUAL_HOST=discussionservice.testing.slidewiki.org
@@ -106,6 +160,7 @@ services:
         tag: "slidewiki.discussionservice"
 
   notificationservice:
+    build: /opt/slidewiki/notification-service
     restart: always
     environment:
       - VIRTUAL_HOST=notificationservice.testing.slidewiki.org
@@ -121,6 +176,7 @@ services:
         tag: "slidewiki.notificationservice"
 
   importservice:
+    build: /opt/slidewiki/import-service
     restart: always
     environment:
       - VIRTUAL_HOST=importservice.testing.slidewiki.org
@@ -139,6 +195,7 @@ services:
         tag: "slidewiki.importservice"
 
   userservice:
+    build: /opt/slidewiki/user-service
     restart: always
     environment:
       - VIRTUAL_HOST=userservice.testing.slidewiki.org
@@ -154,6 +211,7 @@ services:
         tag: "slidewiki.userservice"
 
   pdfservice:
+    build: /opt/slidewiki/PDF-Service
     restart: always
     environment:
       - VIRTUAL_HOST=pdfservice.testing.slidewiki.org
@@ -169,6 +227,7 @@ services:
         tag: "slidewiki.pdfservice"
 
   fileservice:
+    build: /opt/slidewiki/file-service
     restart: always
     environment:
       - VIRTUAL_HOST=fileservice.testing.slidewiki.org
@@ -186,6 +245,7 @@ services:
         tag: "slidewiki.fileservice"
 
   searchservice:
+    build: /opt/slidewiki/search-service
     restart: always
     environment:
       - VIRTUAL_HOST=searchservice.testing.slidewiki.org
@@ -199,23 +259,6 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.searchservice"
-
-  solr:
-    restart: always
-    volumes:
-      - solr-data:/solr-data
-    environment:
-      - VIRTUAL_HOST=solr.testing.slidewiki.org
-      - VIRTUAL_PORT=8983
-      - LETSENCRYPT_HOST=solr.testing.slidewiki.org
-      - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
-    depends_on:
-      - logger
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "localhost:24224"
-        tag: "slidewiki.solr"
 
   #xapi:
   #  restart: always
@@ -232,19 +275,8 @@ services:
   #      fluentd-address: "localhost:24224"
   #      tag: "slidewiki.xapi"
 
-  mongodb:
-    restart: always
-    volumes:
-      - mongo-data:/data/db
-    depends_on:
-      - logger
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "localhost:24224"
-        tag: "slidewiki.mongodb"
-
   tagservice:
+    build: /opt/slidewiki/tag-service
     restart: always
     environment:
       - VIRTUAL_HOST=tagservice.testing.slidewiki.org
@@ -257,8 +289,9 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.tagservice"
- 
+
   nlpstore:
+    build: /opt/slidewiki/nlp-store-service
     restart: always
     environment:
       - VIRTUAL_HOST=nlpstore.testing.slidewiki.org
@@ -271,19 +304,7 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpstore"
- 
-  logger:
-    image: slidewiki/logger
-    restart: always
-    volumes:
-      - /data/maintenance/log:/fluentd/log
-    ports:
-      - "24224:24224"
-    networks:
-      - front-trier
-      - back-trier
-    privileged: true
- 
+
   maintenance:
     build: ../../maintenance/
     restart: always
@@ -303,10 +324,3 @@ services:
     depends_on:
       - mongodb
       - logger
-
-
-volumes:
-  mongo-data: {}
-  solr-data: {}
-  files: {}
-  certs: {}
