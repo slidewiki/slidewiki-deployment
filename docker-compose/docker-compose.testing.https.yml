@@ -79,6 +79,20 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_DISCUSSION=https://discussionservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
+      - SERVICE_URL_IMPORT=https://importservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=https://imageservice.stable.slidewiki.org
+      - SERVICE_URL_SEARCH=https://searchservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
+      - SERVICE_URL_TAG=https://tagservice.testing.slidewiki.org
+      - SERVICE_VAR_IMPORT_HOST=importservice.testing.slidewiki.org
+      - SERVICE_PROTOCOL_IMPORT=https
+      - SERVICE_PORT_IMPORT=443
       - LETSENCRYPT_HOST=testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
       - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=PRIVATE_KEY
@@ -97,6 +111,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=deckservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=deckservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
@@ -125,13 +140,13 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.unoconv"
 
-
-
   activitiesservice:
     build: /opt/slidewiki/activities-service
     restart: always
     environment:
       - VIRTUAL_HOST=activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=activitiesservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
@@ -148,6 +163,10 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=discussionservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=discussionservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
@@ -164,6 +183,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=notificationservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
@@ -180,9 +200,11 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=importservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
+      - SERVICE_HOST_UNOCONV=unoconvservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=importservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
-      - SERVICE_HOST_UNOCONV=unoconvservice.testing.slidewiki.org
 #      - LETSENCRYPT_TEST=true
     volumes:
       - files:/data/files
@@ -199,6 +221,14 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=userservice.testing.slidewiki.org
+      - URL_PLATFORM=https://testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
+      - SMTP_PORT=25
+      - SMTP_HOST=localhost
+  #    - SMTP_FROM=me@hostername.org
+  #    - SMTP_CLIENTNAME=
+  #    - APIKey=
+      - JWT_SERIAL=69aac7f95a9152cd4ae7667c80557c284e413d748cca4c5715b3f02020a5ae1b
       - LETSENCRYPT_HOST=userservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
@@ -215,6 +245,9 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=pdfservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
+      - SERVICE_URL_PLATFORM=https://testing.slidewiki.org
       - LETSENCRYPT_HOST=pdfservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
@@ -249,6 +282,8 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=searchservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=searchservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
@@ -280,6 +315,16 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=tagservice.testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_DISCUSSION=https://discussionservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
+      - SERVICE_URL_SEARCH=https://searchservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=https://imageservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
+      - SERVICE_URL_IMPORT=https://importservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=tagservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
     depends_on:
@@ -295,6 +340,16 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=nlpstore.testing.slidewiki.org
+      - SERVICE_URL_DECK=https://deckservice.testing.slidewiki.org
+      - SERVICE_URL_DISCUSSION=https://discussionservice.testing.slidewiki.org
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.testing.slidewiki.org
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.testing.slidewiki.org
+      - SERVICE_URL_USER=https://userservice.testing.slidewiki.org
+      - SERVICE_URL_SEARCH=https://searchservice.testing.slidewiki.org
+      - SERVICE_URL_IMAGE=https://imageservice.testing.slidewiki.org
+      - SERVICE_URL_FILE=https://fileservice.testing.slidewiki.org
+      - SERVICE_URL_PDF=https://pdfservice.testing.slidewiki.org
+      - SERVICE_URL_IMPORT=https://importservice.testing.slidewiki.org
       - LETSENCRYPT_HOST=nlpstore.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
     depends_on:
