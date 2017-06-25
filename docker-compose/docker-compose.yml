@@ -159,8 +159,6 @@ services:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
-    volumes:
-      - /data/userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
       - mongodb
 

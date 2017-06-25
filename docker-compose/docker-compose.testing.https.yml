@@ -232,6 +232,8 @@ services:
       - LETSENCRYPT_HOST=userservice.testing.slidewiki.org
       - LETSENCRYPT_EMAIL=pbaptist@uni-bonn.de
 #      - LETSENCRYPT_TEST=true
+    volumes:
+      - /data/userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
       - logger
     logging:
