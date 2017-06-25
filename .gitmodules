@@ -1,3 +1,0 @@
-[submodule "docker-compose/solrserver-config"]
-	path = docker-compose/solrserver-config
-	url = https://github.com/slidewiki/solrserver-config.git
