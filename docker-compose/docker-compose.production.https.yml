@@ -1,0 +1,366 @@
+version: '2'
+
+volumes:
+
+  mongo-data: {}
+  solr-data: {}
+  files: {}
+  certs: {}
+
+services:
+
+  # for production: image that pulls backups and provides access to backups and logs via HTTP
+  maintenance:
+    build: ../../maintenance/
+    restart: always
+    expose:
+      - "80"
+    environment:
+      - VIRTUAL_HOST=maintenance.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=maintenance.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    networks:
+      - front-trier
+      - back-trier
+    volumes:
+      - /data/maintenance:/maintenance
+      - files:/data/files # used to backup files
+    depends_on:
+      - mongodb
+      - logger
+
+  # for production: let's encrypt companion for automatically acquiring TLS certs
+  letsencrypt:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+    volumes_from:
+      - webserver
+
+  # for production: Fluentd based logging
+  logger:
+    image: slidewiki/logger
+    restart: always
+    volumes:
+      - /data/maintenance/log:/fluentd/log
+    ports:
+      - "24224:24224"
+    networks:
+      - front-trier
+      - back-trier
+    privileged: true
+
+  mongodb:
+    volumes:
+      - mongo-data:/data/db
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.mongodb"
+
+  solr:
+    volumes:
+      - solr-data:/solr-data
+    environment:
+      - VIRTUAL_HOST=solr.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=solr.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.solr"
+
+  webserver:
+    environment:
+      - BASENAME=${BASE_DOMAIN}
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.webserver"
+
+  platform:
+    build: /opt/slidewiki/slidewiki-platform
+    environment:
+      - VIRTUAL_HOST=${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
+      - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
+      - SERVICE_PROTOCOL_IMPORT=https
+      - SERVICE_PORT_IMPORT=443
+      - LETSENCRYPT_HOST=${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=${RECAPTCHA_PRIVATE_KEY}
+      - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=${RECAPTCHA_PUBLIC_KEY}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.platform"
+
+  deckservice:
+    build: /opt/slidewiki/deck-service
+    environment:
+      - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=deckservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.deckservice"
+
+  unoconvservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=unoconvservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=unoconvservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.unoconv"
+
+  activitiesservice:
+    build: /opt/slidewiki/activities-service
+    environment:
+      - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=activitiesservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.activitiesservice"
+
+  discussionservice:
+    build: /opt/slidewiki/discussion-service
+    environment:
+      - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=discussionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.discussionservice"
+
+  notificationservice:
+    build: /opt/slidewiki/notification-service
+    environment:
+      - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=notificationservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.notificationservice"
+
+  importservice:
+    build: /opt/slidewiki/import-service
+    environment:
+      - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+      - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=importservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    volumes:
+      - files:/data/files
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.importservice"
+
+  userservice:
+    build: /opt/slidewiki/user-service
+    environment:
+      - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
+      - URL_PLATFORM=https://${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SMTP_PORT
+      - SMTP_HOST
+      - SMTP_FROM
+      - SMTP_CLIENTNAME
+      - JWT_SERIAL
+      - LETSENCRYPT_HOST=userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    volumes:
+      - ./userservice/providerConfig.json:/nodeApp/config.json
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.userservice"
+
+  pdfservice:
+    build: /opt/slidewiki/PDF-Service
+    environment:
+      - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=pdfservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.pdfservice"
+
+  fileservice:
+    build: /opt/slidewiki/file-service
+    environment:
+      - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=fileservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    volumes:
+      - files:/data/files
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.fileservice"
+
+  searchservice:
+    build: /opt/slidewiki/search-service
+    environment:
+      - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=searchservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.searchservice"
+
+  #xapi:
+  #  environment:
+  #    - VIRTUAL_HOST=xapiservice.${BASE_DOMAIN}
+  #    - LETSENCRYPT_HOST=xapiservice.${BASE_DOMAIN}
+  #    - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+  #    - LETSENCRYPT_TEST=true
+  #  depends_on:
+  #    - logger
+  #  logging:
+  #    driver: fluentd
+  #    options:
+  #      fluentd-address: "localhost:24224"
+  #      tag: "slidewiki.xapi"
+
+  tagservice:
+    build: /opt/slidewiki/tag-service
+    environment:
+      - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=tagservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.tagservice"
+
+  nlpstore:
+    build: /opt/slidewiki/nlp-store-service
+    environment:
+      - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpstore"

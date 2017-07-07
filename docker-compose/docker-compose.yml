@@ -23,6 +23,8 @@ services:
     image: slidewiki/solr:latest
     container_name: solr
     restart: always
+    environment:
+      - VIRTUAL_PORT=8983
     expose:
       - "8983"
     networks:
@@ -84,6 +86,9 @@ services:
   unoconvservice:
     image: zrrrzzt/docker-unoconv-webservice
     restart: always
+    environment:
+      - VIRTUAL_PORT=3000
+      - PAYLOAD_MAX_SIZE=314572800
     expose:
       - "3000"
     networks:
