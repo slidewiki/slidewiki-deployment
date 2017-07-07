@@ -15,8 +15,6 @@ services:
         - "27017"
     networks:
       - back-trier
-    volumes:
-      - database:/data/db
     command: mongod --replSet "rs0"
 
   solr:
