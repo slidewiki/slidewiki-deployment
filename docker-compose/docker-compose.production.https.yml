@@ -322,6 +322,7 @@ services:
       - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=tagservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
     depends_on:
       - logger
     logging:
@@ -345,6 +346,7 @@ services:
       - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
     depends_on:
       - logger
     logging:
