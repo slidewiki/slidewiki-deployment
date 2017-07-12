@@ -20,7 +20,7 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Add crontab file in the cron directory
 ADD crontab /etc/cron.d/simple-cron
-ADD backup_database.sh /backup.sh
+ADD backup.sh /backup.sh
 
 RUN chmod +x /backup.sh && chmod 0644 /etc/cron.d/simple-cron
 
