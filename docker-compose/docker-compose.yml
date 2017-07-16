@@ -9,7 +9,6 @@ services:
 
   mongodb:
     image: mongo:3.4
-    container_name: mongodb
     restart: always
     expose:
       - "27017"
@@ -18,8 +17,7 @@ services:
     command: mongod --replSet "rs0"
 
   solr:
-    image: slidewiki/solr:${SLIDEWIKI_VERSION}
-    container_name: solr
+    image: slidewiki/solr:latest
     restart: always
     environment:
       - VIRTUAL_PORT=8983
@@ -32,7 +30,7 @@ services:
       - mongodb
 
   webserver:
-    image: slidewiki/webproxy:${SLIDEWIKI_VERSION}
+    image: slidewiki/webproxy:latest
     restart: always
     ports:
       - "80:80"
