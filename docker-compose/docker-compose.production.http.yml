@@ -1,0 +1,301 @@
+version: '2'
+
+volumes:
+
+  mongo-data: {}
+  solr-data: {}
+  files: {}
+
+services:
+
+  # for production: image that pulls backups and provides access to backups and logs via HTTP
+  maintenance:
+    build: ../maintenance/
+    restart: always
+    expose:
+      - "80"
+    environment:
+      - VIRTUAL_HOST=maintenance.${BASE_DOMAIN}
+    networks:
+      - front-trier
+      - back-trier
+    volumes:
+      - /data/maintenance:/maintenance
+      - files:/data/files # used to backup files
+    depends_on:
+      - mongodb
+      - logger
+
+  # for production: Fluentd based logging
+  logger:
+    image: slidewiki/logger:latest
+    restart: always
+    volumes:
+      - /data/maintenance/log:/fluentd/log
+    ports:
+      - "24224:24224"
+    networks:
+      - front-trier
+      - back-trier
+    privileged: true
+
+  mongodb:
+    volumes:
+      - mongo-data:/data/db
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.mongodb"
+
+  solr:
+    volumes:
+      - solr-data:/solr-data
+    environment:
+      - VIRTUAL_HOST=solr.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.solr"
+
+  webserver:
+    environment:
+      - BASENAME=${BASE_DOMAIN}
+    ports:
+      - "80:80"
+    volumes:
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.webserver"
+
+  platform:
+    environment:
+      - VIRTUAL_HOST=${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_SEARCH=http://searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_TAG=http://tagservice.${BASE_DOMAIN}
+      - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
+      - SERVICE_PROTOCOL_IMPORT=http
+      - SERVICE_PORT_IMPORT=80
+      - SERVICE_USER_APIKEY=${API_KEY}
+      - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=${RECAPTCHA_PRIVATE_KEY}
+      - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=${RECAPTCHA_PUBLIC_KEY}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.platform"
+
+  deckservice:
+    environment:
+      - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.deckservice"
+
+  unoconvservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=unoconvservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.unoconv"
+
+  activitiesservice:
+    environment:
+      - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.activitiesservice"
+
+  discussionservice:
+    environment:
+      - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.discussionservice"
+
+  notificationservice:
+    environment:
+      - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.notificationservice"
+
+  importservice:
+    environment:
+      - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
+    volumes:
+      - files:/data/files
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.importservice"
+
+  userservice:
+    environment:
+      - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
+      - URL_PLATFORM=http://${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
+      - SMTP_PORT
+      - SMTP_HOST
+      - SMTP_FROM
+      - SMTP_CLIENTNAME
+      - JWT_SERIAL
+      - APIKey=${API_KEY}
+    volumes:
+      - ./userservice/providerConfig.json:/nodeApp/config.json
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.userservice"
+
+  pdfservice:
+    environment:
+      - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.pdfservice"
+
+  fileservice:
+    environment:
+      - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
+    volumes:
+      - files:/data/files
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.fileservice"
+
+  searchservice:
+    environment:
+      - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.searchservice"
+
+  #xapi:
+  #  environment:
+  #    - VIRTUAL_HOST=xapiservice.${BASE_DOMAIN}
+  #  depends_on:
+  #    - logger
+  #  logging:
+  #    driver: fluentd
+  #    options:
+  #      fluentd-address: "localhost:24224"
+  #      tag: "slidewiki.xapi"
+
+  tagservice:
+    environment:
+      - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_SEARCH=http://searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMAGE=http://imageservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.tagservice"
+
+  nlpstore:
+    environment:
+      - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_SEARCH=http://searchservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMAGE=http://imageservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpstore"
