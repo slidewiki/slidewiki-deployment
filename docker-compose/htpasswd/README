@@ -1,0 +1,7 @@
+This folder is read by the slidewiki/webproxy and can contain htpasswd files named with the FQDN of the host for which the contained passwords should be effective.
+
+Example:
+
+htpasswd -c maintenance.domain.com admin
+
+creates a password file for the maintenance access of SlideWiki running on domain.com
