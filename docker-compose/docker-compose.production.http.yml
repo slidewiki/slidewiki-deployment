@@ -21,7 +21,7 @@ services:
       - front-trier
       - back-trier
     volumes:
-      - /data/maintenance:/maintenance
+      - ${MAINTENANCE_DIR}:/maintenance
       - files:/data/files # used to backup files
     depends_on:
       - mongodb
@@ -32,7 +32,7 @@ services:
     image: slidewiki/logger:latest
     restart: always
     volumes:
-      - /data/maintenance/log:/fluentd/log
+      - ${MAINTENANCE_DIR}/log:/fluentd/log
     ports:
       - "24224:24224"
     networks:
