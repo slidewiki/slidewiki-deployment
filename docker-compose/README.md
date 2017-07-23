@@ -10,7 +10,7 @@ This section explains the configurtion necessary for starting a SlideWiki deploy
 
 ### Basic configuration (.env file)
 
-The `.env` file holds the basic configuration of the SlideWiki deployment. It defines environment variables use in the docker-compose to configure the system. In general it should be sufficient only to conigure this file, changes to the compose files are only necessary when the structure of the deployment needs to be changed. In the following the individual variables will be explained:
+The `.env` file holds the basic configuration of the SlideWiki deployment. It defines environment variables used in the docker-compose to configure the system. In general it should be sufficient only to configure this file, changes to the compose files are only necessary when the structure of the deployment needs to be changed. In the following the individual variables will be explained:
 
 - `SLIDEWIKI_VERSION` the version of SlideWiki to run. This determines which Docker images are use (== Tag on Docker Hub).
 - `BASE_DOMAIN` sets base domain for your deployment. The Platform will be accessible under this name. The microservice will be accessible under `<service>.BASE_DOMAIN` (e.g. deckservice.mydomain.com, userservice.mydomain.com etc.).
