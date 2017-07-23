@@ -1,6 +1,15 @@
-# slidewiki-deployment
-Scripts and configs to deploy SlideWiki to different environments
+# SlideWiki Deployment
 
-To clone, run `git clone --recursive ...`
+This repository is a collection of tools used to run the SlideWiki microservice setup. 
 
-See subfolder Readme files for method specific documentation
+## `/bin`
+
+This directory holds script for handling the SlideWiki Git repositories.
+
+## `/docker-compose`
+
+This directory holds docker-compose files, configrations and script for running SlideWiki in a production deployment. See the README included for information about configuring and handling a deployment.
+
+## `/maintenace`
+
+This directory hold the source code for the maintenance image. A docker image that pulls backups from SlideWiki and serves the backups and log files via HTTP.
