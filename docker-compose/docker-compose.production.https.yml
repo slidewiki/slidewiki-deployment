@@ -60,7 +60,7 @@ services:
       - logger
     logging:
       driver: fluentd
-       options:
+      options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.mongodb"
 
@@ -82,6 +82,9 @@ services:
   webserver:
     environment:
       - BASENAME=${BASE_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
       - certs:/etc/nginx/certs:ro
       - /etc/nginx/vhost.d
@@ -95,7 +98,6 @@ services:
         tag: "slidewiki.webserver"
 
   platform:
-    build: /opt/slidewiki/slidewiki-platform
     environment:
       - VIRTUAL_HOST=${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
@@ -126,7 +128,6 @@ services:
         tag: "slidewiki.platform"
 
   deckservice:
-    build: /opt/slidewiki/deck-service
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
@@ -157,7 +158,6 @@ services:
         tag: "slidewiki.unoconv"
 
   activitiesservice:
-    build: /opt/slidewiki/activities-service
     environment:
       - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
@@ -174,7 +174,6 @@ services:
         tag: "slidewiki.activitiesservice"
 
   discussionservice:
-    build: /opt/slidewiki/discussion-service
     environment:
       - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
@@ -193,7 +192,6 @@ services:
         tag: "slidewiki.discussionservice"
 
   notificationservice:
-    build: /opt/slidewiki/notification-service
     environment:
       - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
@@ -209,7 +207,6 @@ services:
         tag: "slidewiki.notificationservice"
 
   importservice:
-    build: /opt/slidewiki/import-service
     environment:
       - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
@@ -229,7 +226,6 @@ services:
         tag: "slidewiki.importservice"
 
   userservice:
-    build: /opt/slidewiki/user-service
     environment:
       - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
       - URL_PLATFORM=https://${BASE_DOMAIN}
@@ -254,7 +250,6 @@ services:
         tag: "slidewiki.userservice"
 
   pdfservice:
-    build: /opt/slidewiki/PDF-Service
     environment:
       - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
@@ -272,7 +267,6 @@ services:
         tag: "slidewiki.pdfservice"
 
   fileservice:
-    build: /opt/slidewiki/file-service
     environment:
       - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=fileservice.${BASE_DOMAIN}
@@ -289,7 +283,6 @@ services:
         tag: "slidewiki.fileservice"
 
   searchservice:
-    build: /opt/slidewiki/search-service
     environment:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
@@ -320,7 +313,6 @@ services:
   #      tag: "slidewiki.xapi"
 
   tagservice:
-    build: /opt/slidewiki/tag-service
     environment:
       - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
@@ -345,7 +337,6 @@ services:
         tag: "slidewiki.tagservice"
 
   nlpstore:
-    build: /opt/slidewiki/nlp-store-service
     environment:
       - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}

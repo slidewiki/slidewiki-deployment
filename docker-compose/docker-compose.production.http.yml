@@ -5,6 +5,7 @@ volumes:
   mongo-data: {}
   solr-data: {}
   files: {}
+  certs: {}
 
 services:
 
