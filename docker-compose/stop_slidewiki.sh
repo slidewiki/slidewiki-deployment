@@ -2,4 +2,4 @@
 
 PRJ=$(cat instance_name)
 
-docker-compose -p $PRJ -f docker-compose.yml -f docker-compose.production.https.yml down
+docker-compose -p $PRJ -f docker-compose.yml -f docker-compose.testing.https.yml down
