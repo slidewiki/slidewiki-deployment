@@ -118,7 +118,6 @@ services:
 
   grafana:
     image: grafana/grafana
-    container_name: grafana
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
