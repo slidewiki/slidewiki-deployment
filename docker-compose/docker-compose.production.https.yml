@@ -101,7 +101,7 @@ services:
     depends_on:
       - cadvisor
     networks:
-      - monitor-net
+      - metrics-net
 
   cadvisor:
     image: google/cadvisor:v0.26.1
@@ -114,7 +114,7 @@ services:
     ports:
       - 8080:8080
     networks:
-      - monitor-net
+      - metrics-net
 
   grafana:
     image: grafana/grafana
@@ -134,7 +134,7 @@ services:
       - prometheus
     networks:
       - front-trier
-      - monitor-net
+      - metrics-net
 
 # _________________________________ DATABASE __________________________________
 
