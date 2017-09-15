@@ -85,6 +85,7 @@ services:
 
 # __________________________________ METRICS __________________________________
 
+  # metrics database
   prometheus:
     image: prom/prometheus
     restart: unless-stopped
@@ -103,19 +104,7 @@ services:
     networks:
       - metrics-net
 
-  cadvisor:
-    image: google/cadvisor:v0.26.1
-    restart: always
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 8080:8080
-    networks:
-      - metrics-net
-
+  # fancy visualization
   grafana:
     image: grafana/grafana
     volumes:
@@ -133,6 +122,37 @@ services:
       - prometheus
     networks:
       - front-trier
+      - metrics-net
+
+  # container metrics
+  cadvisor:
+    image: google/cadvisor:v0.26.1
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    networks:
+      - metrics-net
+
+  # host metrics
+  nodeexporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '-collector.procfs=/host/proc'
+      - '-collector.sysfs=/host/sys'
+      - '-collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: always
+    ports:
+      - 9100:9100
+    networks:
       - metrics-net
 
 # _________________________________ DATABASE __________________________________
