@@ -192,12 +192,15 @@ services:
       - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
       - URL_PLATFORM=http://${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
-      - SMTP_PORT
-      - SMTP_HOST
-      - SMTP_FROM
-      - SMTP_CLIENTNAME
-      - JWT_SERIAL
-      - APIKey=${API_KEY}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_CLIENTNAME=${SMTP_CLIENTNAME}
+      - SMTP_ENABLED=${SMTP_ENABLED}
+      - JWT_SERIAL=${JWT_SERIAL}
+      - APIKEY=${APIKEY}
+      - URL_PLATFORM=https://${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
     volumes:
       - ./userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
