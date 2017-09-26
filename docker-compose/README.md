@@ -1,6 +1,6 @@
 # SlideWiki Production Deployment
 
-SlideWiki is an application that build on the principles of microservice architectures. The individual parts of the SlideWiki microservice architecture are realized as [Docker](https://www.docker.com/) containers. SlideWiki uses the [Docker Compose](https://docs.docker.com/compose/overview/) tool for deployment. 
+SlideWiki is an application that build on the principles of microservice architectures. The individual parts of the SlideWiki microservice architecture are realized as [Docker](https://www.docker.com/) containers. SlideWiki uses the [Docker Compose](https://docs.docker.com/compose/overview/) tool for deployment.
 
 
 ## Preparing for Deplyoment
@@ -14,7 +14,7 @@ The `.env` file holds the basic configuration of the SlideWiki deployment. It de
 
 - `SLIDEWIKI_VERSION` the version of SlideWiki to run. This determines which Docker images are use (== Tag on Docker Hub).
 - `BASE_DOMAIN` sets base domain for your deployment. The Platform will be accessible under this name. The microservice will be accessible under `<service>.BASE_DOMAIN` (e.g. deckservice.mydomain.com, userservice.mydomain.com etc.).
-- `LETSENCRYPT_EMAIL` email address for automatic LetsEncrypt certification. 
+- `LETSENCRYPT_EMAIL` email address for automatic LetsEncrypt certification.
 - `LETSENCRYPT_TEST` if set to true the LetsEncrypt certification will only pull self-signed certificates. This is handy for testing purposes as this doesn't impact the LetsEncrypt certificate limits for your domain.
 - `RECAPTCHA_PRIVATE_KEY` private key for ReCaptcha.
 - `RECAPTCHA_PUBLIC_KEY` public key for ReCaptacha.
@@ -23,6 +23,7 @@ The `.env` file holds the basic configuration of the SlideWiki deployment. It de
 - `SMTP_FROM` email address used when SlideWiki sends out registration/password reset mails.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_CLIENTNAME` hostname, port of SMTP server to use when sending mails and FQDN of sending machine (optional).
 - `MAINTENANCE_DIR` directory where the backups are stored and served from (`MAINTENACE_DIR/(db|files)`). By default the logger is configured to store the logs under `MAINTENACE_DIR/log` so they are also accessible via HTTP.
+
 
 ### Instance Name
 
@@ -37,6 +38,17 @@ Example:
 ```
 ...all services, networks and volumes will be prefixed `test_`
 
+
+### Protocol
+
+SlideWiki can run in HTTP or HTTPS mode. Which protocol is used is determined by the `protocol` file.
+
+```
+> echo http > protocol
+
+> echo https > protocol
+
+```
 
 ### Volumes
 
@@ -55,11 +67,11 @@ SlideWiki uses the following volumes in a production deployment:
 By default SlideWiki will be deployed with HTTPS enabled.
 
 #### Automatic Certification with LetsEncrypt
-By default the SlideWiki deployment will try to accquire certificates via LetsEncrypt automatically. The only thing necessary to make this work is configrating an email address in the `.env` file (LETSENCRYPT_EMAIL) and setting `LETSENCRYPT_TEST` to `false`. 
+By default the SlideWiki deployment will try to accquire certificates via LetsEncrypt automatically. The only thing necessary to make this work is configrating an email address in the `.env` file (LETSENCRYPT_EMAIL) and setting `LETSENCRYPT_TEST` to `false`.
 
 
 #### Use Manually Obtained Certificates
-In case you have TLS certificates at hand and don't want to use the automatic certification you have to comment out the `letsencrypt` service section in the `docker-compose.production.https.yml` file. 
+In case you have TLS certificates at hand and don't want to use the automatic certification you have to comment out the `letsencrypt` service section in the `docker-compose.production.https.yml` file.
 
 TODO: Add instruction how to add the certs.
 
@@ -71,7 +83,7 @@ The maintenance image pulls nightly backups of the MongoDB and also the content 
 - `MAINTENANCE_DIR/db` MongoDB backups
 - `MAINTENANCE_DIR/files` backups of the `files` volume
 
-The maintenance webserver can by default be reached under `maintenance.BASE_DOMAIN`. 
+The maintenance webserver can by default be reached under `maintenance.BASE_DOMAIN`.
 
 #### `htpasswd` for Maintenance
 In order to secure your backups and logs you need to set a password that NGINX uses to restrict access to the maintenance webserver. The password file is a standard `htpasswd` file generated with the Apache server `htpasswd` tool. The password file must be named like the domain name the maintenance server will be accessible by from the internet.
@@ -142,9 +154,3 @@ SlideWiki's SOLR search index can be deleted and re-indexed using the `re-index.
 
 
 ### Thumbnail Generation
-
-
-
-
-
-
