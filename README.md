@@ -4,7 +4,7 @@ This repository is a collection of tools used to run the SlideWiki microservice 
 
 ## `/bin`
 
-This directory holds script for handling the SlideWiki Git repositories.
+This directory holds scripts for handling the SlideWiki Git repositories.
 
 ## `/docker-compose`
 
