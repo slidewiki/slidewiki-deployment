@@ -105,6 +105,7 @@ services:
       - DATABASE_URL=mongodb
     depends_on:
       - deckservice
+      - notificationservice
       - userservice
       - mongodb
 
@@ -121,8 +122,7 @@ services:
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
     depends_on:
-      - activitiesservice
-      - notificationservice
+      - deckservice
       - userservice
       - mongodb
 
