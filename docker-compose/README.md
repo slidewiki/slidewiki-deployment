@@ -71,9 +71,9 @@ By default the SlideWiki deployment will try to accquire certificates via LetsEn
 
 
 #### Use Manually Obtained Certificates
-In case you have TLS certificates at hand and don't want to use the automatic certification you have to comment out the `letsencrypt` service section in the `docker-compose.production.https.yml` file.
+In case you have TLS certificates at hand and don't want to use the automatic certification you have to comment out the `letsencrypt` service section in the `docker-compose.production.https.yml` file and then place the certificate/s and key/s into the certs volume folder, using .crt and .key extensions respectively.
 
-TODO: Add instruction how to add the certs.
+For more info, please check the jwilder/nginx-proxy related [documentation](https://github.com/jwilder/nginx-proxy/blob/master/README.md#ssl-support).
 
 
 ### Maintenance
