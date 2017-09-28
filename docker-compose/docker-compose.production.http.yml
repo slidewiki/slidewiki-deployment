@@ -135,6 +135,7 @@ services:
     environment:
       - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
@@ -148,8 +149,6 @@ services:
     environment:
       - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger

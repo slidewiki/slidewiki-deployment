@@ -161,6 +161,7 @@ services:
     environment:
       - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=activitiesservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
@@ -177,8 +178,6 @@ services:
     environment:
       - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=discussionservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
