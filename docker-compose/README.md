@@ -18,6 +18,7 @@ The `.env` file holds the basic configuration of the SlideWiki deployment. It de
 - `LETSENCRYPT_TEST` if set to true the LetsEncrypt certification will only pull self-signed certificates. This is handy for testing purposes as this doesn't impact the LetsEncrypt certificate limits for your domain.
 - `RECAPTCHA_PRIVATE_KEY` private key for ReCaptcha.
 - `RECAPTCHA_PUBLIC_KEY` public key for ReCaptacha.
+- `SECRET_REVIEW_KEY` passphrase that reviewers need to know additionally to their credentials in order to review users and decks
 - `API_KEY` SlideWiki API key used for communication between Platform and User Service.
 - `JWT_SERIAL` JWT Ssrial for services
 - `SMTP_FROM` email address used when SlideWiki sends out registration/password reset mails.

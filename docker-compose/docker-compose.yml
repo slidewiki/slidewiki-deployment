@@ -75,6 +75,7 @@ services:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
+      - SECRET_REVIEW_KEY=${SECRET_REVIEW_KEY}
     depends_on:
       - fileservice
       - mongodb
@@ -173,6 +174,7 @@ services:
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
       - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - SECRET_REVIEW_KEY=${SECRET_REVIEW_KEY}
     depends_on:
       - mongodb
 
