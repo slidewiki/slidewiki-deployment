@@ -17,7 +17,7 @@ services:
     command: mongod --replSet "rs0"
 
   solr:
-    image: slidewiki/solr:latest
+    image: slidewiki/solr:${SLIDEWIKI_VERSION}
     restart: always
     environment:
       - VIRTUAL_PORT=8983
