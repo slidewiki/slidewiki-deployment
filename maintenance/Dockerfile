@@ -37,4 +37,5 @@ RUN apt-get autoremove -y && apt-get -y clean && \
 		rm -rf /var/lib/apt/lists/*
 
 Entrypoint []
-CMD supervisord
+#CMD supervisord
+CMD http-server -p 80 -i
