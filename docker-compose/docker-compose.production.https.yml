@@ -185,7 +185,7 @@ services:
     environment:
       - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=https://pdfservicZe.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
     depends_on:
       - logger
