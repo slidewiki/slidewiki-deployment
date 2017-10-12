@@ -1,0 +1,284 @@
+version: '1'
+
+mongodb:
+  image: mongo:3.4
+  restart: always
+  expose:
+    - "27017"
+  command: mongod --replSet "rs0"
+  volumes:
+    - ${MAINTENANCE_DIR}/log:/fluentd/log
+  privileged: true
+
+solr:
+  image: slidewiki/solr:${SLIDEWIKI_VERSION}
+  restart: always
+  environment:
+    - VIRTUAL_PORT=8983
+    - VIRTUAL_HOST=solr.${BASE_DOMAIN}
+  expose:
+    - "8983"
+  links:
+    - mongodb
+  volumes:
+    - /data/slidewiki/volumes/solr:/solr-data
+
+platform:
+  image: slidewiki/platform:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - PORT=80
+    - VIRTUAL_HOST=${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
+    - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+    - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+    - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
+    - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+    - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
+    - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+    - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
+    - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
+    - SERVICE_PROTOCOL_IMPORT=https
+    - SERVICE_PORT_IMPORT=443
+    - SERVICE_USER_APIKEY=${APIKEY}
+    - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=${RECAPTCHA_PRIVATE_KEY}
+    - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=${RECAPTCHA_PUBLIC_KEY}
+    - SMTP_PORT=${SMTP_PORT}
+    - SMTP_HOST=${SMTP_HOST}
+    - SMTP_FROM=${SMTP_FROM}
+    - SMTP_TO=${SMTP_TO}
+    - SMTP_CLIENTNAME=${SMTP_CLIENTNAME}
+  links:
+    - deckservice
+    - activitiesservice
+    - discussionservice
+    - notificationservice
+    - importservice
+    - userservice
+    - pdfservice
+    - fileservice
+    - searchservice
+    - tagservice
+
+deckservice:
+  image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - SECRET_REVIEW_KEY=${SECRET_REVIEW_KEY}
+    - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+  links:
+    - fileservice
+    - mongodb
+
+unoconvservice:
+  image: zrrrzzt/docker-unoconv-webservice
+  restart: always
+  environment:
+    - VIRTUAL_PORT=3000
+    - PAYLOAD_MAX_SIZE=314572800
+    - VIRTUAL_HOST=unoconvservice.${BASE_DOMAIN}
+  expose:
+    - "3000"
+
+activitiesservice:
+  image: slidewiki/activitiesservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+  links:
+    - deckservice
+    - notificationservice
+    - userservice
+    - mongodb
+
+discussionservice:
+  image: slidewiki/discussionservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+  links:
+    - deckservice
+    - userservice
+    - mongodb
+
+notificationservice:
+  image: slidewiki/notificationservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+  links:
+    - userservice
+    - mongodb
+
+importservice:
+  image: slidewiki/importservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
+    - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+    - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
+  links:
+    - deckservice
+    - fileservice
+    - mongodb
+  volumes:
+    - /data/slidewiki/volumes/files:/data/files
+
+userservice:
+  image: slidewiki/userservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - NODE_TLS_REJECT_UNAUTHORIZED=0
+    - SECRET_REVIEW_KEY=${SECRET_REVIEW_KEY}
+    - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
+    - URL_PLATFORM=https://${BASE_DOMAIN}
+    - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+    - SMTP_PORT=${SMTP_PORT}
+    - SMTP_HOST=${SMTP_HOST}
+    - SMTP_FROM=${SMTP_FROM}
+    - SMTP_CLIENTNAME=${SMTP_CLIENTNAME}
+    - SMTP_ENABLED=${SMTP_ENABLED}
+    - JWT_SERIAL=${JWT_SERIAL}
+    - APIKEY=${APIKEY}
+  links:
+    - mongodb
+  volumes:
+    - ./userservice/providerConfig.json:/nodeApp/config.json
+
+pdfservice:
+  image: slidewiki/pdfservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+    - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
+  links:
+    - deckservice
+
+fileservice:
+  image: slidewiki/fileservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - APPLICATION_PATH=/data/files
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
+  links:
+    - mongodb
+  volumes:
+    - /data/slidewiki/volumes/files:/data/files
+
+searchservice:
+  image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - SOLR_CORE=swikcore
+    - SOLR_HOST=solr
+    - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+  links:
+    - userservice
+    - solr
+    - mongodb
+
+tagservice:
+  image: slidewiki/tagservice:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
+    - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+    - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+    - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
+    - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
+    - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+    - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+    - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
+  links:
+    - mongodb
+
+nlpstore:
+  image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
+    - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+    - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+    - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
+    - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
+    - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+    - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+    - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
+  links:
+    - mongodb
