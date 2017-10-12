@@ -223,6 +223,7 @@ services:
       - LETSENCRYPT_HOST=importservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
+      - JWT_SERIAL=${JWT_SERIAL}
     volumes:
       - files:/data/files
     depends_on:
@@ -281,6 +282,7 @@ services:
       - LETSENCRYPT_HOST=fileservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
+      - JWT_SERIAL=${JWT_SERIAL}
     volumes:
       - files:/data/files
     depends_on:
