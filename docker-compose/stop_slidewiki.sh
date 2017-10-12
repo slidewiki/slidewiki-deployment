@@ -3,4 +3,4 @@
 PRJ=$(cat instance_name)
 PROTO=$(cat protocol)
 
-docker-compose -p $PRJ -f docker-compose.yml -f docker-compose.production.$PROTO.yml down
+docker-compose -p $PRJ -f docker-compose.v1.yml down
