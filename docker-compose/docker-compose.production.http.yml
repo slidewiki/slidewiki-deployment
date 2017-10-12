@@ -116,6 +116,10 @@ services:
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_TAG=tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=userservice.${BASE_DOMAIN}
+      - SERVICE_URL_TRANSLATION=translationservice.${BASE_DOMAIN}
+      - JWT_SERIAL=${JWT_SERIAL}
     depends_on:
       - logger
     logging:
