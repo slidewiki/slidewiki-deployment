@@ -74,6 +74,10 @@ deckservice:
     - SECRET_REVIEW_KEY=${SECRET_REVIEW_KEY}
     - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
     - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+    - SERVICE_URL_TAG=tagservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=userservice.${BASE_DOMAIN}
+    - SERVICE_URL_TRANSLATION=translationservice.${BASE_DOMAIN}
+    - JWT_SERIAL=${JWT_SERIAL}
   links:
     - fileservice
     - mongodb

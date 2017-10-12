@@ -79,6 +79,10 @@ services:
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_TAG=tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=userservice.${BASE_DOMAIN}
+      - SERVICE_URL_TRANSLATION=translationservice.${BASE_DOMAIN}
+      - JWT_SERIAL=${JWT_SERIAL}
     depends_on:
       - logger
     logging:
@@ -180,7 +184,7 @@ services:
     environment:
       - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservicZe.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
     depends_on:
       - logger
