@@ -5,7 +5,7 @@ mongodb:
     - "27017"
   command: mongod --replSet "rs0"
   volumes:
-    - ${MAINTENANCE_DIR}/log:/fluentd/log
+    - /data/slidewiki/volumes/mongodb:/data/db
   privileged: true
 
 solr:
