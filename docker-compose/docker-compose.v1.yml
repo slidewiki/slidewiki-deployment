@@ -156,6 +156,7 @@ importservice:
     - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
     - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
     - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+    - JWT_SERIAL=${JWT_SERIAL}
   links:
     - deckservice
     - fileservice
@@ -214,6 +215,7 @@ fileservice:
     - DATABASE_PORT=27017
     - DATABASE_URL=mongodb
     - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
+    - JWT_SERIAL=${JWT_SERIAL}
   links:
     - mongodb
   volumes:

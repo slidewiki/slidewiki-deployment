@@ -148,6 +148,7 @@ services:
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
+      - JWT_SERIAL=${JWT_SERIAL}
     volumes:
       - files:/data/files
     depends_on:
@@ -197,6 +198,7 @@ services:
   fileservice:
     environment:
       - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
+      - JWT_SERIAL=${JWT_SERIAL}
     volumes:
       - files:/data/files
     depends_on:
