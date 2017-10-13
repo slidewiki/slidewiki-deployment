@@ -9,7 +9,7 @@ mongodb:
   privileged: true
 
 solr:
-  image: slidewiki/solr:${SLIDEWIKI_VERSION}
+  image: slidewiki/solr
   restart: always
   environment:
     - VIRTUAL_PORT=8983
@@ -22,7 +22,7 @@ solr:
     - /data/slidewiki/volumes/solr:/solr-data
 
 platform:
-  image: slidewiki/platform:${SLIDEWIKI_VERSION}
+  image: slidewiki/platform
   restart: always
   expose:
     - "80"
@@ -63,7 +63,7 @@ platform:
     - tagservice
 
 deckservice:
-  image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/deckservice
   restart: always
   expose:
     - "80"
@@ -93,7 +93,7 @@ unoconvservice:
     - "3000"
 
 activitiesservice:
-  image: slidewiki/activitiesservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/activitiesservice
   restart: always
   expose:
     - "80"
@@ -112,7 +112,7 @@ activitiesservice:
     - mongodb
 
 discussionservice:
-  image: slidewiki/discussionservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/discussionservice
   restart: always
   expose:
     - "80"
@@ -129,7 +129,7 @@ discussionservice:
     - mongodb
 
 notificationservice:
-  image: slidewiki/notificationservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/notificationservice
   restart: always
   expose:
     - "80"
@@ -144,7 +144,7 @@ notificationservice:
     - mongodb
 
 importservice:
-  image: slidewiki/importservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/importservice
   restart: always
   expose:
     - "80"
@@ -165,7 +165,7 @@ importservice:
     - /data/slidewiki/volumes/files:/data/files
 
 userservice:
-  image: slidewiki/userservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/userservice
   restart: always
   expose:
     - "80"
@@ -191,7 +191,7 @@ userservice:
     - ./userservice/providerConfig.json:/nodeApp/config.json
 
 pdfservice:
-  image: slidewiki/pdfservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/pdfservice
   restart: always
   expose:
     - "80"
@@ -205,7 +205,7 @@ pdfservice:
     - deckservice
 
 fileservice:
-  image: slidewiki/fileservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/fileservice
   restart: always
   expose:
     - "80"
@@ -222,7 +222,7 @@ fileservice:
     - /data/slidewiki/volumes/files:/data/files
 
 searchservice:
-  image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/searchservice
   restart: always
   expose:
     - "80"
@@ -241,7 +241,7 @@ searchservice:
     - mongodb
 
 tagservice:
-  image: slidewiki/tagservice:${SLIDEWIKI_VERSION}
+  image: slidewiki/tagservice
   restart: always
   expose:
     - "80"
@@ -264,7 +264,7 @@ tagservice:
     - mongodb
 
 nlpstore:
-  image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+  image: slidewiki/nlpstore
   restart: always
   expose:
     - "80"
