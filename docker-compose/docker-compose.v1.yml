@@ -9,7 +9,7 @@ mongodb:
   privileged: true
 
 solr:
-  image: slidewiki/solr
+  image: slidewiki/solr:latest-dev
   restart: always
   environment:
     - VIRTUAL_PORT=8983
@@ -22,7 +22,7 @@ solr:
     - /data/slidewiki/volumes/solr:/solr-data
 
 platform:
-  image: slidewiki/platform
+  image: slidewiki/platform:latest-dev
   restart: always
   expose:
     - "80"
@@ -63,7 +63,7 @@ platform:
     - tagservice
 
 deckservice:
-  image: slidewiki/deckservice
+  image: slidewiki/deckservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -83,7 +83,7 @@ deckservice:
     - mongodb
 
 unoconvservice:
-  image: zrrrzzt/docker-unoconv-webservice
+  image: zrrrzzt/docker-unoconv-webservice:latest-dev
   restart: always
   environment:
     - VIRTUAL_PORT=3000
@@ -93,7 +93,7 @@ unoconvservice:
     - "3000"
 
 activitiesservice:
-  image: slidewiki/activitiesservice
+  image: slidewiki/activitiesservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -112,7 +112,7 @@ activitiesservice:
     - mongodb
 
 discussionservice:
-  image: slidewiki/discussionservice
+  image: slidewiki/discussionservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -129,7 +129,7 @@ discussionservice:
     - mongodb
 
 notificationservice:
-  image: slidewiki/notificationservice
+  image: slidewiki/notificationservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -144,7 +144,7 @@ notificationservice:
     - mongodb
 
 importservice:
-  image: slidewiki/importservice
+  image: slidewiki/importservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -165,7 +165,7 @@ importservice:
     - /data/slidewiki/volumes/files:/data/files
 
 userservice:
-  image: slidewiki/userservice
+  image: slidewiki/userservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -191,7 +191,7 @@ userservice:
     - ./userservice/providerConfig.json:/nodeApp/config.json
 
 pdfservice:
-  image: slidewiki/pdfservice
+  image: slidewiki/pdfservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -205,7 +205,7 @@ pdfservice:
     - deckservice
 
 fileservice:
-  image: slidewiki/fileservice
+  image: slidewiki/fileservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -241,7 +241,7 @@ searchservice:
     - mongodb
 
 tagservice:
-  image: slidewiki/tagservice
+  image: slidewiki/tagservice:latest-dev
   restart: always
   expose:
     - "80"
@@ -264,7 +264,7 @@ tagservice:
     - mongodb
 
 nlpstore:
-  image: slidewiki/nlpstore
+  image: slidewiki/nlpstore:2.5.0
   restart: always
   expose:
     - "80"
