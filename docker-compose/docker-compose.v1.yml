@@ -83,7 +83,7 @@ deckservice:
     - mongodb
 
 unoconvservice:
-  image: zrrrzzt/docker-unoconv-webservice:latest-dev
+  image: zrrrzzt/docker-unoconv-webservice:latest
   restart: always
   environment:
     - VIRTUAL_PORT=3000
