@@ -222,7 +222,7 @@ fileservice:
     - /data/slidewiki/volumes/files:/data/files
 
 searchservice:
-  image: slidewiki/searchservice
+  image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
   restart: always
   expose:
     - "80"
