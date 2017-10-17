@@ -6,6 +6,7 @@ volumes:
   solr-data: {}
   files: {}
   certs: {}
+  certs2: {}
 
 services:
 
@@ -17,7 +18,7 @@ services:
       - "80"
     environment:
       - VIRTUAL_HOST=maintenance.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=maintenance.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     networks:
@@ -31,15 +32,15 @@ services:
       - logger
 
   # for production: let's encrypt companion for automatically acquiring TLS certs
-  #letsencrypt:
-  #  image: jrcs/letsencrypt-nginx-proxy-companion
-  #  restart: always
-  #  volumes:
-  #    - /var/run/docker.sock:/var/run/docker.sock:ro
-  #    - certs:/etc/nginx/certs:rw
-  #  volumes_from:
-  #    - webserver
-
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes_from:
+      - webserver
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+  
   # for production: Fluentd based logging
   logger:
     image: slidewiki/logger:latest
@@ -69,8 +70,9 @@ services:
       - solr-data:/solr-data
     environment:
       - VIRTUAL_HOST=solr.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=solr.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
     depends_on:
       - logger
     logging:
@@ -98,8 +100,9 @@ services:
         tag: "slidewiki.webserver"
 
   platform:
+    image: slidewiki/platform:2.5.0-emaildebug
     environment:
-      - VIRTUAL_HOST=${BASE_DOMAIN}
+      - VIRTUAL_HOST=${BASE_DOMAIN},platform.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
@@ -113,7 +116,7 @@ services:
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=https
       - SERVICE_PORT_IMPORT=443
-      - LETSENCRYPT_HOST=${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - SERVICE_USER_APIKEY=${APIKEY}
       - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=${RECAPTCHA_PRIVATE_KEY}
@@ -136,7 +139,7 @@ services:
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=deckservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
       - SERVICE_URL_TAG=tagservice.${BASE_DOMAIN}
@@ -155,7 +158,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=unoconvservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=unoconvservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
@@ -172,7 +175,7 @@ services:
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=activitiesservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
@@ -188,7 +191,7 @@ services:
       - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=discussionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
@@ -203,7 +206,7 @@ services:
     environment:
       - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=notificationservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
@@ -220,7 +223,7 @@ services:
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=importservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
       - JWT_SERIAL=${JWT_SERIAL}
@@ -237,7 +240,7 @@ services:
   userservice:
     environment:
       - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST=${LETSENCRYPT_TEST}
       - URL_PLATFORM=https://${BASE_DOMAIN}
@@ -265,7 +268,7 @@ services:
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=pdfservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
@@ -279,7 +282,7 @@ services:
   fileservice:
     environment:
       - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=fileservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
       - JWT_SERIAL=${JWT_SERIAL}
@@ -298,7 +301,7 @@ services:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=searchservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
@@ -312,7 +315,7 @@ services:
   #xapi:
   #  environment:
   #    - VIRTUAL_HOST=xapiservice.${BASE_DOMAIN}
-  #    - LETSENCRYPT_HOST=xapiservice.${BASE_DOMAIN}
+  #    - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
   #    - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
   #    - LETSENCRYPT_TEST=true
   #  depends_on:
@@ -336,7 +339,7 @@ services:
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=tagservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
@@ -360,7 +363,7 @@ services:
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=slidewiki.org,platform.slidewiki.org,solr.slidewiki.org,deckservice.slidewiki.org,unoconvservice.slidewiki.org,activitiesservice.slidewiki.org,discussionservice.slidewiki.org,notificationservice.slidewiki.org,importservice.slidewiki.org,userservice.slidewiki.org,pdfservice.slidewiki.org,fileservice.slidewiki.org,searchservice.slidewiki.org,tagservice.slidewiki.org,nlpstore.slidewiki.org
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     depends_on:
