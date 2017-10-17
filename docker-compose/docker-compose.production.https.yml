@@ -6,7 +6,6 @@ volumes:
   solr-data: {}
   files: {}
   certs: {}
-  certs2: {}
 
 services:
 
