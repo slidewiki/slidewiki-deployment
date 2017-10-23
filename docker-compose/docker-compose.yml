@@ -79,12 +79,12 @@ services:
       - SERVICE_URL_USER=http://userservice
       - SERVICE_URL_FILE=http://fileservice
       - SERVICE_URL_TAG=http://tagservice
-      - SERVICE_URL_TRANSLATION=http://translationservice
+      # - SERVICE_URL_TRANSLATION=http://translationservice
     depends_on:
       - userservice
       - fileservice
       - tagservice
-      - translationservice
+      # - translationservice
       - mongodb
 
   unoconvservice:
