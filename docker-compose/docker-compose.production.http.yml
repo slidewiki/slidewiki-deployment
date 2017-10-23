@@ -115,10 +115,6 @@ services:
   deckservice:
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_TAG=tagservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=userservice.${BASE_DOMAIN}
-      - SERVICE_URL_TRANSLATION=translationservice.${BASE_DOMAIN}
       - JWT_SERIAL=${JWT_SERIAL}
     depends_on:
       - logger
@@ -143,9 +139,6 @@ services:
   activitiesservice:
     environment:
       - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -157,8 +150,6 @@ services:
   discussionservice:
     environment:
       - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -170,7 +161,6 @@ services:
   notificationservice:
     environment:
       - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -182,9 +172,6 @@ services:
   importservice:
     environment:
       - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
-      - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
       - JWT_SERIAL=${JWT_SERIAL}
     volumes:
       - files:/data/files
@@ -200,7 +187,6 @@ services:
     environment:
       - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
       - URL_PLATFORM=http://${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_FROM=${SMTP_FROM}
@@ -208,8 +194,6 @@ services:
       - SMTP_ENABLED=${SMTP_ENABLED}
       - JWT_SERIAL=${JWT_SERIAL}
       - APIKEY=${APIKEY}
-      - URL_PLATFORM=https://${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
     volumes:
       - ./userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
@@ -223,9 +207,8 @@ services:
   pdfservice:
     environment:
       - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -251,8 +234,6 @@ services:
   searchservice:
     environment:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -275,16 +256,6 @@ services:
   tagservice:
     environment:
       - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_SEARCH=http://searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMAGE=http://imageservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -293,23 +264,13 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.tagservice"
 
-  nlpstore:
-    environment:
-      - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_SEARCH=http://searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMAGE=http://imageservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}
-    depends_on:
-      - logger
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "localhost:24224"
-        tag: "slidewiki.nlpstore"
+  # nlpstore:
+  #   environment:
+  #     - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+  #   depends_on:
+  #     - logger
+  #   logging:
+  #     driver: fluentd
+  #     options:
+  #       fluentd-address: "localhost:24224"
+  #       tag: "slidewiki.nlpstore"

@@ -135,13 +135,9 @@ services:
   deckservice:
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=deckservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
-      - SERVICE_URL_TAG=tagservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=userservice.${BASE_DOMAIN}
-      - SERVICE_URL_TRANSLATION=translationservice.${BASE_DOMAIN}
       - JWT_SERIAL=${JWT_SERIAL}
     depends_on:
       - logger
@@ -169,9 +165,6 @@ services:
   activitiesservice:
     environment:
       - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=activitiesservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -186,8 +179,6 @@ services:
   discussionservice:
     environment:
       - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=discussionservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -202,7 +193,6 @@ services:
   notificationservice:
     environment:
       - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=notificationservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -217,9 +207,6 @@ services:
   importservice:
     environment:
       - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-      - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=importservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -241,7 +228,6 @@ services:
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST=${LETSENCRYPT_TEST}
       - URL_PLATFORM=https://${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_FROM=${SMTP_FROM}
@@ -262,7 +248,6 @@ services:
   pdfservice:
     environment:
       - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
       - LETSENCRYPT_HOST=pdfservice.${BASE_DOMAIN}
@@ -296,8 +281,6 @@ services:
   searchservice:
     environment:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=searchservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -326,16 +309,6 @@ services:
   tagservice:
     environment:
       - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=tagservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -347,26 +320,16 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.tagservice"
 
-  nlpstore:
-    environment:
-      - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
-      - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
-      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-      - LETSENCRYPT_TEST
-    depends_on:
-      - logger
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: "localhost:24224"
-        tag: "slidewiki.nlpstore"
+  # nlpstore:
+  #   environment:
+  #     - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+  #     - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
+  #     - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+  #     - LETSENCRYPT_TEST
+  #   depends_on:
+  #     - logger
+  #   logging:
+  #     driver: fluentd
+  #     options:
+  #       fluentd-address: "localhost:24224"
+  #       tag: "slidewiki.nlpstore"
