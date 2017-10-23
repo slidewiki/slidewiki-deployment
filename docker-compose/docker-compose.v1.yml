@@ -201,6 +201,7 @@ pdfservice:
     - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
     - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
     - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
   links:
     - deckservice
 
