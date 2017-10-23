@@ -226,6 +226,7 @@ services:
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
