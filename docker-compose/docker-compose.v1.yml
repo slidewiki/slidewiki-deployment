@@ -292,7 +292,7 @@ signalingservice:
   restart: on-failure:5
   expose:
     - "80"
-  external_links:
+  links:
     - mongodb
   environment:
     - APPLICATION_PORT=80
