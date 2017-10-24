@@ -286,3 +286,14 @@ tagservice:
 #     - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
 #   links:
 #     - mongodb
+
+signalingservice:
+  image: slidewiki/webrtcsignalingservice:latest
+  restart: on-failure:5
+  expose:
+    - "80"
+  external_links:
+    - mongodb
+  environment:
+    - APPLICATION_PORT=80
+    - VIRTUAL_HOST=signalingservice.${BASE_DOMAIN}
