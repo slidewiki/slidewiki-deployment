@@ -309,3 +309,5 @@ maintenance:
   volumes:
     - /data/slidewiki/volumes/maintenance:/maintenance
     - /data/slidewiki/volumes/backup/files:/data/files # used to backup files   /data/slidewiki/volumes/files
+  links:
+    - mongodb
