@@ -174,10 +174,6 @@ services:
       - LETSENCRYPT_HOST=signalingservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
-    environment:
-      - APPLICATION_PORT=80
-      - DATABASE_PORT=27017
-      - DATABASE_URL=mongodb
     logging:
       driver: fluentd
       options:
