@@ -94,7 +94,7 @@ services:
       - back-trier
 
   signalingservice:
-    image: slidewiki/webrtcsignalingservice::${SLIDEWIKI_VERSION}
+    image: slidewiki/webrtcsignalingservice:${SLIDEWIKI_VERSION}
     restart: always
     expose:
       - "80"
