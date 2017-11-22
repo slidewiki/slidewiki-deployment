@@ -140,9 +140,9 @@ services:
       - LETSENCRYPT_HOST=deckservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
-      - SERVICE_URL_TAG=tagservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=userservice.${BASE_DOMAIN}
-      - SERVICE_URL_TRANSLATION=translationservice.${BASE_DOMAIN}
+      - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_TRANSLATION=https://translationservice.${BASE_DOMAIN}
       - JWT_SERIAL=${JWT_SERIAL}
     depends_on:
       - logger
