@@ -80,6 +80,7 @@ services:
     depends_on:
       - fileservice
       - mongodb
+      - userservice
 
   unoconvservice:
     image: zrrrzzt/docker-unoconv-webservice
