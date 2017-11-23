@@ -31,14 +31,14 @@ services:
       - logger
 
   # for production: let's encrypt companion for automatically acquiring TLS certs
-  #letsencrypt:
-  #  image: jrcs/letsencrypt-nginx-proxy-companion
-  #  restart: always
-  #  volumes:
-  #    - /var/run/docker.sock:/var/run/docker.sock:ro
-  #    - certs:/etc/nginx/certs:rw
-  #  volumes_from:
-  #    - webserver
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+    volumes_from:
+      - webserver
 
   # for production: Fluentd based logging
   logger:
