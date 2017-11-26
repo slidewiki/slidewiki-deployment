@@ -99,7 +99,7 @@ services:
 
   platform:
     environment:
-      - VIRTUAL_HOST=${BASE_DOMAIN}
+      - VIRTUAL_HOST=${BASE_DOMAIN},www.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
