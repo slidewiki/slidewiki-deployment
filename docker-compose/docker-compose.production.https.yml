@@ -386,3 +386,16 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpstore"
+
+  nlpservice:
+    environment:
+      - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
+      - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpservice"
