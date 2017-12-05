@@ -1,4 +1,4 @@
-FROM mongo:latest
+FROM mongo:3.4
 MAINTAINER The SlideWiki Project <dev@slidewiki.org>
 
 # ---------------- #
@@ -37,5 +37,5 @@ RUN apt-get autoremove -y && apt-get -y clean && \
 		rm -rf /var/lib/apt/lists/*
 
 Entrypoint []
-#CMD supervisord
-CMD http-server -p 80 -i
+CMD supervisord
+#CMD http-server -p 80 -i

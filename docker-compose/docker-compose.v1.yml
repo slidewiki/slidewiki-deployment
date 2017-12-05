@@ -39,7 +39,7 @@ platform:
     - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
     - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
     - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
-    - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
+    - SERVICE_URL_SIGNALING=https://signalingservice.experimental.slidewiki.org
     - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
     - SERVICE_PROTOCOL_IMPORT=https
     - SERVICE_PORT_IMPORT=443
@@ -288,16 +288,16 @@ tagservice:
 #   links:
 #     - mongodb
 
-signalingservice:
-  image: slidewiki/webrtcsignalingservice:latest
-  restart: on-failure:5
-  expose:
-    - "80"
-  links:
-    - mongodb
-  environment:
-    - APPLICATION_PORT=80
-    - VIRTUAL_HOST=signalingservice.${BASE_DOMAIN}
+#signalingservice:
+#  image: slidewiki/webrtcsignalingservice:latest
+#  restart: on-failure:5
+#  expose:
+#    - "80"
+#  links:
+#    - mongodb
+#  environment:
+#    - APPLICATION_PORT=80
+#    - VIRTUAL_HOST=signalingservice.${BASE_DOMAIN}
 
 maintenance:
   build: ../maintenance/
@@ -308,6 +308,6 @@ maintenance:
   #   - VIRTUAL_HOST=maintenance.${BASE_DOMAIN}
   volumes:
     - /data/slidewiki/volumes/maintenance:/maintenance
-    - /data/slidewiki/volumes/backup/files:/data/files # used to backup files   /data/slidewiki/volumes/files
+    - /data/slidewiki/volumes/files:/data/files # used to backup files   /data/slidewiki/volumes/files
   links:
     - mongodb
