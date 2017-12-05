@@ -45,7 +45,7 @@ services:
 
   platform:
     environment:
-      - VIRTUAL_HOST=${BASE_DOMAIN}
+      - VIRTUAL_HOST=${BASE_DOMAIN},www.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
@@ -56,6 +56,7 @@ services:
       - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=https
       - SERVICE_PORT_IMPORT=443
@@ -102,6 +103,19 @@ services:
       options:
         fluentd-address: "logger:24224"
         tag: "slidewiki.unoconv"
+
+  signalingservice:
+    restart: always
+    environment:
+      - VIRTUAL_HOST=signalingservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=signalingservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.signalingservice"
 
   activitiesservice:
     environment:
@@ -164,6 +178,7 @@ services:
       - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
       - URL_PLATFORM=https://${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_FROM=${SMTP_FROM}
@@ -187,6 +202,7 @@ services:
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -277,3 +293,16 @@ services:
       options:
         fluentd-address: "logger:24224"
         tag: "slidewiki.nlpstore"
+
+  nlpservice:
+    environment:
+      - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
+      - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpservice"
