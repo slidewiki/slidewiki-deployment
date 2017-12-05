@@ -28,7 +28,7 @@ platform:
     - "80"
   environment:
     - PORT=80
-    - VIRTUAL_HOST=${BASE_DOMAIN}
+    - VIRTUAL_HOST=${BASE_DOMAIN},www.${BASE_DOMAIN}
     - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
     - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
     - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
@@ -179,6 +179,7 @@ userservice:
     - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
     - URL_PLATFORM=https://${BASE_DOMAIN}
     - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
     - SMTP_PORT=${SMTP_PORT}
     - SMTP_HOST=${SMTP_HOST}
     - SMTP_FROM=${SMTP_FROM}
@@ -265,28 +266,37 @@ tagservice:
   links:
     - mongodb
 
-# nlpstore:
-#   image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
-#   restart: always
-#   expose:
-#     - "80"
-#   environment:
-#     - APPLICATION_PORT=80
-#     - DATABASE_PORT=27017
-#     - DATABASE_URL=mongodb
-#     - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
-#     - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-#     - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
-#     - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
-#     - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
-#     - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-#     - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
-#     - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
-#     - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-#     - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
-#     - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
-#   links:
-#     - mongodb
+nlpstore:
+  image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+  restart: always
+  expose:
+    - "80"
+  environment:
+    - APPLICATION_PORT=80
+    - DATABASE_PORT=27017
+    - DATABASE_URL=mongodb
+    - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+    - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
+    - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+    - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
+    - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+    - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
+    - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
+    - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+    - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+    - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
+  links:
+    - mongodb
+
+nlpservice:
+  image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
+  restart: on-failure:5
+  expose:
+    - "9000"
+  environment:
+    - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
+    - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
 
 #signalingservice:
 #  image: slidewiki/webrtcsignalingservice:latest
