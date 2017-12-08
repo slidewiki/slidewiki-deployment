@@ -111,6 +111,8 @@ services:
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLP==https://nlpservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLPSTORE=https://nlpstore.${BASE_DOMAIN}
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=https
       - SERVICE_PORT_IMPORT=443
