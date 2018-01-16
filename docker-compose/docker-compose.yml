@@ -63,6 +63,7 @@ services:
       - searchservice
       - tagservice
       - signalingservice
+      - questionservice
 
   deckservice:
     image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
@@ -288,3 +289,19 @@ services:
       - back-trier
     expose:
       - "9000"
+
+  questionservice:
+    image: slidewiki/questionservice:${SLIDEWIKI_VERSION}
+    restart: always
+    expose:
+      - "80"
+    networks:
+      - front-trier
+      - back-trier
+    environment:
+      - APPLICATION_PORT=80
+      - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
+    depends_on:
+      - deckservice
+      - mongodb

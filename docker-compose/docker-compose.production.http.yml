@@ -93,6 +93,7 @@ services:
       - SERVICE_URL_SEARCH=http://searchservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=http://tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_QUESTION=http://questionservice.${BASE_DOMAIN}
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=http
       - SERVICE_PORT_IMPORT=80
@@ -323,3 +324,15 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpservice"
+
+  questionservice:
+    environment:
+      - VIRTUAL_HOST=questionservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.questionservice"
