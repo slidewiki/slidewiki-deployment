@@ -11,7 +11,7 @@ services:
 
   # for production: image that pulls backups and provides access to backups and logs via HTTP
   maintenance:
-    build: ../maintenance/
+    image: slidewiki/maintenance:${SLIDEWIKI_VERSION}
     restart: always
     expose:
       - "80"
