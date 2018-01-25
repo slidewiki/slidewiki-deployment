@@ -405,6 +405,9 @@ services:
     environment:
       - VIRTUAL_HOST=questionservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=questionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
     depends_on:
       - logger
     logging:
