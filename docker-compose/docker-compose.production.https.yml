@@ -392,6 +392,8 @@ services:
     environment:
       - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
       - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLPSTORE=https://nlpstore.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=nlpservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST

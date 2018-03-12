@@ -318,6 +318,8 @@ services:
   nlpservice:
     environment:
       - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
+      - SERVICE_URL_DECK=deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLPSTORE=nlpstore.${BASE_DOMAIN}
       - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
     logging:
       driver: fluentd
