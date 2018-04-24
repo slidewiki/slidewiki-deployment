@@ -175,6 +175,8 @@ services:
       - LETSENCRYPT_HOST=signalingservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
+    volumes:
+      - /signalingservice/twitterConfig.json:/nodeApp/config.json:ro
     logging:
       driver: fluentd
       options:
