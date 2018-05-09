@@ -176,7 +176,7 @@ services:
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
     volumes:
-      - /signalingservice/twitterConfig.json:/nodeApp/config.json:ro
+      - ./signalingservice/twitterConfig.json:/nodeApp/config.json:ro
     logging:
       driver: fluentd
       options:
