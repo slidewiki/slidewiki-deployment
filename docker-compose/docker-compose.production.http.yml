@@ -210,6 +210,9 @@ services:
       - JWT_SERIAL=${JWT_SERIAL}
       - APIKEY=${APIKEY}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - LTI_ID=${LTI_ID}
+      - LTI_KEY=${LTI_KEY}
+      - LTI_SECRET=${LTI_SECRET}
     volumes:
       - ./userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
