@@ -11,7 +11,7 @@ services:
 
   # for production: image that pulls backups and provides access to backups and logs via HTTP
   maintenance:
-    build: ../maintenance/
+    image: slidewiki/maintenance:${SLIDEWIKI_VERSION}
     restart: always
     expose:
       - "80"
@@ -110,6 +110,7 @@ services:
       - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
+      - SERVICE_URL_QUESTION=https://questionservice.${BASE_DOMAIN}
       - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
       - SERVICE_URL_NLP==https://nlpservice.${BASE_DOMAIN}
       - SERVICE_URL_NLPSTORE=https://nlpstore.${BASE_DOMAIN}
@@ -176,6 +177,8 @@ services:
       - LETSENCRYPT_HOST=signalingservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
+    volumes:
+      - ./signalingservice/twitterConfig.json:/nodeApp/config.json:ro
     logging:
       driver: fluentd
       options:
@@ -393,6 +396,8 @@ services:
     environment:
       - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
       - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLPSTORE=https://nlpstore.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=nlpservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -401,3 +406,18 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpservice"
+
+  questionservice:
+    environment:
+      - VIRTUAL_HOST=questionservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=questionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.questionservice"
