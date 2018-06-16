@@ -74,10 +74,11 @@ services:
 
   unoconvservice:
     image: zrrrzzt/docker-unoconv-webservice
+    network_mode: host
     expose:
-      - "5300"
+      - "${SERVICE_PORT_UNOCONV}"
     environment:
-      - SERVER_PORT=5300
+      - SERVER_PORT=${SERVICE_PORT_UNOCONV}
       - PAYLOAD_MAX_SIZE=314572800
 
   signalingservice:
@@ -137,7 +138,7 @@ services:
     environment:
       - APPLICATION_PORT=${SERVICE_PORT_IMPORT}
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-      - SERVICE_HOST_UNOCONV=unoconvservice
+      - SERVICE_URL_UNOCONV=${BASE_SERVICE_URL}:${SERVICE_PORT_UNOCONV}
       - SERVICE_URL_FILE
       - JWT_SERIAL
 
