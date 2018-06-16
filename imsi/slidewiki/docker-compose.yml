@@ -201,6 +201,7 @@ services:
       - APPLICATION_PORT=5000
       - SOLR_CORE=swikcore
       - SOLR_HOST
+      - SOLR_CONFIG_PORT
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_USER
 
@@ -216,6 +217,7 @@ services:
       - SERVICE_URL_USER
       - SOLR_CORE=swikcore
       - SOLR_HOST
+      - SOLR_CONFIG_PORT
       - AGENDA_JOBS_COLLECTION=agendaJobs
       - AGENDA_JOBS_CONCURRENCY=2
       - JOB_TYPES=searchUpdate
