@@ -9,10 +9,10 @@ networks:
 
 volumes:
 
-  mongo-data:
   solr-data:
   solr-data-nlp:
   files:
+    external: true
 
 services:
 
@@ -43,7 +43,6 @@ services:
       - discussionservice
       - notificationservice
       - importservice
-      - userservice
       - pdfservice
       - fileservice
       - searchservice
@@ -51,15 +50,15 @@ services:
       - signalingservice
       - questionservice
     environment:
-      - SERVICE_USER_APIKEY
       - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=6LdNLyYTAAAAAFMC0J_zuVI1b9lXWZjPH6WLe-vJ
       - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=6LdNLyYTAAAAAINDsVZRKG_E3l3Dvpp5sKboR1ET
-      - SERVICE_URL_DECK=http://deckservice
-      - SERVICE_URL_DISCUSSION=http://discussionservice
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice
-      - SERVICE_URL_NOTIFICATION=http://notificationservice
-      - SERVICE_URL_TAG=http://tagservice
-      - SERVICE_URL_QUESTION=http://questionservice
+      - SERVICE_USER_APIKEY
+      - SERVICE_URL_DECK
+      - SERVICE_URL_DISCUSSION
+      - SERVICE_URL_ACTIVITIES
+      - SERVICE_URL_NOTIFICATION
+      - SERVICE_URL_TAG
+      - SERVICE_URL_QUESTION
       - SERVICE_URL_USER
       - SERVICE_URL_IMPORT
       - SERVICE_URL_FILE
@@ -83,8 +82,6 @@ services:
       - "4000:3000"
     networks:
       - internal
-    depends_on:
-      - userservice
     environment:
       - SECRET_REVIEW_KEY
       - SERVICE_URL_FILE
@@ -123,10 +120,10 @@ services:
       - internal
     depends_on:
       - deckservice
-      - userservice
       - notificationservice
     environment:
       - APPLICATION_PORT=4300
+      - SERVICE_URL_USER
 
   discussionservice:
     image: slidewiki/discussionservice:${SLIDEWIKI_VERSION}
@@ -136,9 +133,9 @@ services:
       - internal
     depends_on:
       - deckservice
-      - userservice
     environment:
       - APPLICATION_PORT=80
+      - SERVICE_URL_USER
 
   notificationservice:
     image: slidewiki/notificationservice:${SLIDEWIKI_VERSION}
@@ -146,8 +143,7 @@ services:
       - internal
     environment:
       - APPLICATION_PORT=80
-    depends_on:
-      - userservice
+      - SERVICE_URL_USER
 
   importservice:
     image: slidewiki/importservice:${SLIDEWIKI_VERSION}
@@ -197,11 +193,12 @@ services:
       - internal
     depends_on:
       - deckservice
-      - userservice
     environment:
       - APPLICATION_PORT=4700
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
       - SERVICE_URL_PDF
+      - SERVICE_URL_DECK
+      - SERVICE_URL_USER
 
   fileservice:
     image: slidewiki/fileservice:${SLIDEWIKI_VERSION}
@@ -226,12 +223,13 @@ services:
       - internal
     depends_on:
       - deckservice
-      - userservice
       - solr
     environment:
       - APPLICATION_PORT=80
       - SOLR_CORE=swikcore
       - SOLR_HOST=solr
+      - SERVICE_URL_DECK
+      - SERVICE_URL_USER
 
   searchindexer:
     image: slidewiki/searchservice:latest-dev
@@ -239,6 +237,7 @@ services:
     networks:
       - internal
     depends_on:
+      - deckservice
       - solr
     environment:
       - SERVICE_URL_DECK
@@ -264,12 +263,12 @@ services:
     networks:
       - host
       - internal
+    depends_on:
+      - deckservice
     environment:
       - APPLICATION_PORT=80
       - SERVICE_URL_DECK
       - SERVICE_URL_NLP=http://nlpservice:9000
-    depends_on:
-      - deckservice
 
   nlpservice:
     image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
