@@ -1,12 +1,5 @@
 version: '2'
 
-networks:
-
-  host:
-    external: true
-
-  internal:
-
 volumes:
 
   solr-data:
@@ -21,22 +14,16 @@ services:
     restart: always
     expose:
       - "8983"
-    networks:
-      - internal
     volumes: 
       - solr-data:/solr-data
       - solr-data-nlp:/solr-data-nlp
-    environment:
-      - VIRTUAL_PORT=8983
 
   platform:
     image: slidewiki/platform:${SLIDEWIKI_VERSION}
     restart: always
+    network_mode: host
     expose:
       - "3000"
-    networks:
-      - host
-      - internal
     depends_on:
       - deckservice
       - activitiesservice
@@ -53,36 +40,35 @@ services:
       - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=6LdNLyYTAAAAAFMC0J_zuVI1b9lXWZjPH6WLe-vJ
       - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=6LdNLyYTAAAAAINDsVZRKG_E3l3Dvpp5sKboR1ET
       - SERVICE_USER_APIKEY
-      - SERVICE_URL_DECK
-      - SERVICE_URL_DISCUSSION
-      - SERVICE_URL_ACTIVITIES
-      - SERVICE_URL_NOTIFICATION
-      - SERVICE_URL_TAG
-      - SERVICE_URL_QUESTION
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - SERVICE_URL_DISCUSSION=${BASE_SERVICE_URL}:{SERVICE_PORT_DISCUSSION}
+      - SERVICE_URL_ACTIVITIES=${BASE_SERVICE_URL}:{SERVICE_PORT_ACTIVITIES}
+      - SERVICE_URL_NOTIFICATION=${BASE_SERVICE_URL}:{SERVICE_PORT_NOTIFICATION}
+      - SERVICE_URL_TAG=${BASE_SERVICE_URL}:{SERVICE_PORT_TAG}
+      - SERVICE_URL_QUESTION=${BASE_SERVICE_URL}:{SERVICE_PORT_QUESTION}
       - SERVICE_URL_USER
-      - SERVICE_URL_IMPORT
       - SERVICE_URL_FILE
       - SERVICE_URL_SEARCH
       - SERVICE_URL_PDF
+      - SERVICE_URL_SIGNALING
+      - SERVICE_URL_IMPORT
       - SERVICE_VAR_IMPORT_HOST
       - SERVICE_PROTOCOL_IMPORT
       - SERVICE_PORT_IMPORT
-      - SERVICE_URL_SIGNALING
-      - SMTP_PORT=
-      - SMTP_HOST=
-      - SMTP_FROM=
-      - SMTP_TO=
-      - SMTP_ENABLED=
+      - SMTP_PORT
+      - SMTP_HOST
+      - SMTP_FROM
+      - SMTP_TO
+      - SMTP_ENABLED
       - LOGGING_LEVEL
 
   deckservice:
     image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
     restart: always
-    ports:
-      - "4000:3000"
-    networks:
-      - internal
+    expose:
+      - "${SERVICE_PORT_DECK}"
     environment:
+      - APPLICATION_PORT=${SERVICE_PORT_DECK}
       - SECRET_REVIEW_KEY
       - SERVICE_URL_FILE
       - SERVICE_URL_USER
@@ -92,19 +78,17 @@ services:
     image: zrrrzzt/docker-unoconv-webservice
     restart: always
     expose:
-      - "3000"
-    networks:
-      - internal
+      - "5300"
     environment:
+      - SERVER_PORT=5300
       - PAYLOAD_MAX_SIZE=314572800
 
   signalingservice:
     image: slidewiki/webrtcsignalingservice:${SLIDEWIKI_VERSION}
+    network_mode: host
     restart: always
     expose:
       - "4900"
-    networks:
-      - host
     volumes:
       - ./signalingservice/twitterConfig.json:/nodeApp/config.json:ro
     environment:
@@ -114,61 +98,60 @@ services:
     image: slidewiki/activitiesservice:${SLIDEWIKI_VERSION}
     restart: always
     expose:
-      - "4300"
-    networks:
-      - host
-      - internal
+      - "${SERVICE_PORT_ACTIVITIES}"
     depends_on:
       - deckservice
       - notificationservice
     environment:
-      - APPLICATION_PORT=4300
+      - APPLICATION_PORT=${SERVICE_PORT_ACTIVITIES}
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - SERVICE_URL_NOTIFICATION=${BASE_SERVICE_URL}:{SERVICE_PORT_NOTIFICATION}
       - SERVICE_URL_USER
 
   discussionservice:
     image: slidewiki/discussionservice:${SLIDEWIKI_VERSION}
+    restart: always
     expose:
-      - "80"
-    networks:
-      - internal
+      - "${SERVICE_PORT_DISCUSSION}"
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=80
+      - APPLICATION_PORT=${SERVICE_PORT_DISCUSSION}
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_USER
 
   notificationservice:
     image: slidewiki/notificationservice:${SLIDEWIKI_VERSION}
-    networks:
-      - internal
+    restart: always
+    expose:
+      - "${SERVICE_PORT_NOTIFICATION}"
     environment:
-      - APPLICATION_PORT=80
+      - APPLICATION_PORT=${SERVICE_PORT_NOTIFICATION}
       - SERVICE_URL_USER
 
   importservice:
     image: slidewiki/importservice:${SLIDEWIKI_VERSION}
+    restart: always
+    network_mode: host
     expose:
-      - "4500"
-    networks:
-      - host
-      - internal
+      - "${SERVICE_PORT_IMPORT}"
     depends_on:
       - deckservice
       - fileservice
       - unoconvservice
     environment:
-      - APPLICATION_PORT=4500
+      - APPLICATION_PORT=${SERVICE_PORT_IMPORT}
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_HOST_UNOCONV=unoconvservice
       - SERVICE_URL_FILE
       - JWT_SERIAL
 
   userservice:
     image: slidewiki/userservice:${SLIDEWIKI_VERSION}
+    restart: always
+    network_mode: host
     expose:
       - "4100"
-    networks:
-      - host
-      - internal
     volumes:
       - ./userservice/providerConfig.json:/nodeApp/config.json
     environment:
@@ -186,109 +169,105 @@ services:
 
   pdfservice:
     image: slidewiki/pdfservice:${SLIDEWIKI_VERSION}
+    restart: always
+    network_mode: host
     expose:
       - "4700"
-    networks:
-      - host
-      - internal
     depends_on:
       - deckservice
     environment:
       - APPLICATION_PORT=4700
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_PDF
-      - SERVICE_URL_DECK
       - SERVICE_URL_USER
 
   fileservice:
     image: slidewiki/fileservice:${SLIDEWIKI_VERSION}
+    restart: always
+    network_mode: host
     expose:
-      - "4600"
-    networks:
-      - host
-      - internal
+      - "${SERVICE_PORT_FILE}"
     volumes:
       - files:/data/files
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=4600
+      - APPLICATION_PORT=${SERVICE_PORT_FILE}
       - APPLICATION_PATH=/data/files
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
 
   searchservice:
     image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
+    restart: always
     expose:
-      - "80"
-    networks:
-      - internal
+      - "5000"
     depends_on:
       - deckservice
       - solr
     environment:
-      - APPLICATION_PORT=80
+      - APPLICATION_PORT=5000
       - SOLR_CORE=swikcore
-      - SOLR_HOST=solr
-      - SERVICE_URL_DECK
+      - SOLR_HOST
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_USER
 
   searchindexer:
     image: slidewiki/searchservice:latest-dev
     command: 'node worker'
-    networks:
-      - internal
+    restart: always
     depends_on:
       - deckservice
       - solr
     environment:
-      - SERVICE_URL_DECK
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_USER
       - SOLR_CORE=swikcore
+      - SOLR_HOST
       - AGENDA_JOBS_COLLECTION=agendaJobs
       - AGENDA_JOBS_CONCURRENCY=2
       - JOB_TYPES=searchUpdate
 
   tagservice:
     image: slidewiki/tagservice:${SLIDEWIKI_VERSION}
+    restart: always
     expose:
-      - "80"
-    networks:
-      - internal
+      - "${SERVICE_PORT_TAG}"
     environment:
-      - APPLICATION_PORT=80
+      - APPLICATION_PORT=${SERVICE_PORT_TAG}
 
   nlpstore:
     image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+    restart: always
     expose:
-      - "80"
-    networks:
-      - host
-      - internal
+      - "${SERVICE_PORT_NLPSTORE}"
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=80
-      - SERVICE_URL_DECK
-      - SERVICE_URL_NLP=http://nlpservice:9000
+      - APPLICATION_PORT=${SERVICE_PORT_NLPSTORE}
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - SERVICE_URL_NLP=${BASE_SERVICE_URL}:9000
 
   nlpservice:
     image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
+    restart: always
     expose:
       - "9000"
-    networks:
-      - internal
-    environment:
-      - APPLICATION_SECRET=sndv9sd98adpvnaa0wefe0fa04nvpdnvp9e+-.sfw03fs
     depends_on:
       - deckservice
       - nlpstore
+    environment:
+      - APPLICATION_SECRET=sndv9sd98adpvnaa0wefe0fa04nvpdnvp9e+-.sfw03fs
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - SERVICE_URL_NLPSTORE=${BASE_SERVICE_URL}:${SERVICE_PORT_NLPSTORE}
 
   questionservice:
     image: slidewiki/questionservice:${SLIDEWIKI_VERSION}
+    restart: always
     expose:
-      - "80"
-    networks:
-      - internal
-    environment:
-      - APPLICATION_PORT=80
+      - "${SERVICE_PORT_QUESTION}"
     depends_on:
       - deckservice
+    environment:
+      - APPLICATION_PORT=${SERVICE_PORT_QUESTION}
+      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
