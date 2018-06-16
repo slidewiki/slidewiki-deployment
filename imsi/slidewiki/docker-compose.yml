@@ -87,11 +87,11 @@ services:
     image: slidewiki/webrtcsignalingservice:${SLIDEWIKI_VERSION}
     network_mode: host
     expose:
-      - "4900"
+      - "${SERVICE_PORT_SIGNALING}"
     volumes:
       - ./signalingservice/twitterConfig.json:/nodeApp/config.json:ro
     environment:
-      - APPLICATION_PORT=4900
+      - APPLICATION_PORT=${SERVICE_PORT_SIGNALING}
 
   activitiesservice:
     image: slidewiki/activitiesservice:${SLIDEWIKI_VERSION}
