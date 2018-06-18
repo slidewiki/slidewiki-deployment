@@ -191,15 +191,17 @@ services:
       - APPLICATION_PORT=${SERVICE_PORT_FILE}
       - APPLICATION_PATH=/data/files
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
 
   searchservice:
     image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
     network_mode: host
     expose:
       - "5000"
-    # depends_on:
+    depends_on:
     #   - deckservice
     #   - solr
+      - searchindexer
     environment:
       - APPLICATION_PORT=5000
       - SOLR_CORE=swikcore
