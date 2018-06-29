@@ -239,7 +239,22 @@ services:
     depends_on:
       - userservice
       - solr
+      - searchindexer
       - mongodb
+
+  searchindexer:
+    image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
+    restart: always
+    command: 'node worker'
+    environment:
+      - SOLR_CORE=swikcore
+      - SOLR_HOST=solr
+      - AGENDA_JOBS_COLLECTION=agendaJobs
+      - AGENDA_JOBS_CONCURRENCY=2
+      - JOB_TYPES=searchUpdate
+    depends_on:
+      - deckservice
+      - solr
 
   #xapi:
   #  image: slidewiki/xapi-service:${SLIDEWIKI_VERSION}
