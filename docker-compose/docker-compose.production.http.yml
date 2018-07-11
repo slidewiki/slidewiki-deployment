@@ -211,6 +211,12 @@ services:
       - JWT_SERIAL=${JWT_SERIAL}
       - APIKEY=${APIKEY}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - LTI_env_user_service
+      - LTI_ID=${LTI_ID}
+      - LTI_KEY=${LTI_KEY}
+      - LTI_SECRET=${LTI_SECRET}
+
     volumes:
       - ./userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
@@ -253,8 +259,6 @@ services:
   searchservice:
     environment:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -262,6 +266,17 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.searchservice"
+
+  searchindexer:
+    environment:
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.searchindexer"
 
   #xapi:
   #  environment:
