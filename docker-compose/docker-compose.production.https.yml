@@ -260,6 +260,7 @@ services:
       - URL_PLATFORM=https://${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_FROM=${SMTP_FROM}
@@ -318,8 +319,6 @@ services:
   searchservice:
     environment:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=searchservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -330,6 +329,17 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.searchservice"
+
+  searchindexer:
+    environment:
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.searchindexer"
 
   #xapi:
   #  environment:
