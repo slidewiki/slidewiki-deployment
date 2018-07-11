@@ -296,14 +296,14 @@ services:
     depends_on:
       - mongodb
 
-  nlpservice:
-    image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
-    restart: on-failure:5
-    networks:
-      - front-trier
-      - back-trier
-    expose:
-      - "9000"
+#  nlpservice:
+#    image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
+#    restart: on-failure:5
+#    networks:
+#      - front-trier
+#      - back-trier
+#    expose:
+#      - "9000"
 
   questionservice:
     image: slidewiki/questionservice:${SLIDEWIKI_VERSION}
