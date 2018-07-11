@@ -247,6 +247,8 @@ services:
     restart: always
     command: 'node worker'
     environment:
+      - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
       - SOLR_CORE=swikcore
       - SOLR_HOST=solr
       - AGENDA_JOBS_COLLECTION=agendaJobs
@@ -255,6 +257,7 @@ services:
     depends_on:
       - deckservice
       - solr
+      - mongodb
 
   #xapi:
   #  image: slidewiki/xapi-service:${SLIDEWIKI_VERSION}
