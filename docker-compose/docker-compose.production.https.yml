@@ -126,6 +126,7 @@ services:
       - SMTP_FROM=${SMTP_FROM}
       - SMTP_TO=${SMTP_TO}
       - SMTP_CLIENTNAME=${SMTP_CLIENTNAME}
+      - SSO_ENABLED=${SSO_ENABLED}
     depends_on:
       - logger
     logging:
