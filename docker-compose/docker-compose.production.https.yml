@@ -260,6 +260,7 @@ services:
       - URL_PLATFORM=https://${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_FROM=${SMTP_FROM}

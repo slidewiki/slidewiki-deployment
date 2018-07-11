@@ -210,6 +210,7 @@ services:
       - JWT_SERIAL=${JWT_SERIAL}
       - APIKEY=${APIKEY}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
     volumes:
       - ./userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
