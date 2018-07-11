@@ -24,6 +24,9 @@ The `.env` file holds the basic configuration of the SlideWiki deployment. It de
 - `SMTP_FROM` email address used when SlideWiki sends out registration/password reset mails.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_CLIENTNAME` hostname, port of SMTP server to use when sending mails and FQDN of sending machine (optional).
 - `MAINTENANCE_DIR` directory where the backups are stored and served from (`MAINTENACE_DIR/(db|files)`). By default the logger is configured to store the logs under `MAINTENACE_DIR/log` so they are also accessible via HTTP.
+- LTI_ID
+- LTI_KEY
+- LTI_SECRET
 
 
 ### Instance Name

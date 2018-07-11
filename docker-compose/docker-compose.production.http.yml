@@ -211,6 +211,11 @@ services:
       - APIKEY=${APIKEY}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - LTI_env_user_service
+      - LTI_ID=${LTI_ID}
+      - LTI_KEY=${LTI_KEY}
+      - LTI_SECRET=${LTI_SECRET}
+
     volumes:
       - ./userservice/providerConfig.json:/nodeApp/config.json
     depends_on:
