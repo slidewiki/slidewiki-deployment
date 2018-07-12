@@ -246,6 +246,8 @@ services:
     image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
     restart: always
     command: 'node worker'
+    networks:
+      - back-trier
     environment:
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
