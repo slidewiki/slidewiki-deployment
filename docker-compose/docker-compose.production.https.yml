@@ -237,7 +237,7 @@ services:
       - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-      - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
+      - SERVICE_URL_UNOCONV=https://unoconvservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=importservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST

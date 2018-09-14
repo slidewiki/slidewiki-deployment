@@ -171,7 +171,6 @@ services:
       - APPLICATION_PORT=80
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
-      - SERVICE_HOST_UNOCONV=unoconvservice.${BASE_DOMAIN}
     depends_on:
       - deckservice
       - fileservice
