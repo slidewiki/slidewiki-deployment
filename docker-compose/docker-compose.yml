@@ -172,6 +172,7 @@ services:
       - DATABASE_PORT=27017
       - DATABASE_URL=mongodb
     depends_on:
+      - unoconvservice
       - deckservice
       - fileservice
       - mongodb
