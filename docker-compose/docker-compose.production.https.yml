@@ -516,7 +516,6 @@ services:
           tag: "slidewiki.learninglockerui"
 
     learninglockerworker:
-      image: slidewiki/learninglocker2-app:${DOCKER_TAG}
       environment:
         - SMTP_HOST=${SMTP_HOST}
         - SMTP_PORT=${SMTP_PORT}
