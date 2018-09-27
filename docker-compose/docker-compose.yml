@@ -351,3 +351,65 @@ services:
   ##
   ##  SlideWiki Learning Analytics Services
   ##
+
+  xapi:
+    image: learninglocker/xapi-service:2.2.7
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
+      - REDIS_URL=redis://redis:6379/0
+      - VIRTUAL_PORT=8081
+    expose:
+      - 8081
+    networks:
+      - front-trier
+      - back-trier
+    depends_on:
+      - mongo
+      - redis
+
+  learninglockerapi:
+    image: slidewiki/learninglocker2-app:${SLIDEWIKI_VERSION}
+    environment:
+      - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
+      - APP_SECRET=${LEARNINGLCOKER_SECRET}
+      - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
+      - VIRTUAL_PORT=8080
+    expose:
+      - 8080
+    command: "node api/dist/server"
+    restart: unless-stopped
+    networks:
+      - front-trier
+      - back-trier
+    depends_on:
+      - mongo
+      - redis
+
+  learninglockerui:
+      image: slidewiki/learninglocker2-app:${SLIDEWIKI_VERSION}
+      environment:
+          - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
+          - APP_SECRET=${LEARNINGLCOKER_SECRET}
+          - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
+          - VIRTUAL_PORT=8080
+      expose:
+          - 8080
+      command: "./entrypoint-ui.sh"
+      restart: unless-stopped
+      depends_on:
+          - mongo
+          - redis
+          - learninglockerapi
+
+  learninglockerworker:
+      image: slidewiki/learninglocker2-app:${SLDIEWIKI_VERSION}
+      environment:
+          - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
+          - APP_SECRET=${LEARNINGLCOKER_SECRET}
+          - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
+      command: "node worker/dist/server"
+      restart: unless-stopped
+      depends_on:
+          - mongo
+          - redis
