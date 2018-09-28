@@ -464,8 +464,8 @@ services:
 
   xapi:
     environment:
-      - VIRTUAL_HOST=xapi.learninglocker.${DOMAIN_NAME}
-      - LETSENCRYPT_HOST=xapi.${DOMAIN_NAME}
+      - VIRTUAL_HOST=xapi.learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=xapi.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     depends_on:
       - logger
@@ -495,39 +495,39 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.learninglockerapi"
 
-    learninglockerui:
-      environment:
-        - SMTP_HOST=${SMTP_HOST}
-        - SMTP_PORT=${SMTP_PORT}
-        - SMTP_SECURED=false
-        - SMTP_USER
-        - SMTP_PASS
-        - VIRTUAL_HOST=learninglocker.${BASE_DOMAIN}
-        - LETSENCRYPT_HOST=learninglocker.${BASE_DOMAIN}
-        - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-      depends_on:
-        - logger
-      volumes:
-        - learninglocker-data:/opt/learninglocker/storage
-      logging:
-        driver: fluentd
-        options:
-          fluentd-address: "localhost:24224"
-          tag: "slidewiki.learninglockerui"
+  learninglockerui:
+    environment:
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURED=false
+      - SMTP_USER
+      - SMTP_PASS
+      - VIRTUAL_HOST=learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    depends_on:
+      - logger
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.learninglockerui"
 
-    learninglockerworker:
-      environment:
-        - SMTP_HOST=${SMTP_HOST}
-        - SMTP_PORT=${SMTP_PORT}
-        - SMTP_SECURED=false
-        - SMTP_USER
-        - SMTP_PASS
-      depends_on:
-        - logger
-      volumes:
-        - learninglocker-data:/opt/learninglocker/storage
-      logging:
-        driver: fluentd
-        options:
-          fluentd-address: "localhost:24224"
-          tag: "slidewiki.learninglockerworker"
+  learninglockerworker:
+    environment:
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURED=false
+      - SMTP_USER
+      - SMTP_PASS
+    depends_on:
+      - logger
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.learninglockerworker"
