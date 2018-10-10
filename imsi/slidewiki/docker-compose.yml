@@ -107,6 +107,9 @@ services:
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_NOTIFICATION=${BASE_SERVICE_URL}:{SERVICE_PORT_NOTIFICATION}
       - SERVICE_URL_USER
+      - LRS_ENDPOINT
+      - LRS_PUBLIC_KEY
+      - LRS_SECRET
 
   discussionservice:
     image: slidewiki/discussionservice:${SLIDEWIKI_VERSION}
