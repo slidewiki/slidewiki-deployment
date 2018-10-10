@@ -4,6 +4,7 @@ volumes:
 
   solr-data:
   solr-data-nlp:
+  learninglocker-data:
   files:
     external: true
 
@@ -22,9 +23,9 @@ services:
     image: slidewiki/platform:${SLIDEWIKI_VERSION}
     network_mode: host
     expose:
-      - "3000"
+      - 3000
     depends_on:
-      # - deckservice
+      - deckservice
       - activitiesservice
       - discussionservice
       - notificationservice
@@ -99,7 +100,7 @@ services:
     expose:
       - "${SERVICE_PORT_ACTIVITIES}"
     depends_on:
-      # - deckservice
+      - deckservice
       - notificationservice
     environment:
       - APPLICATION_PORT=${SERVICE_PORT_ACTIVITIES}
@@ -112,8 +113,8 @@ services:
     network_mode: host
     expose:
       - "${SERVICE_PORT_DISCUSSION}"
-    # depends_on:
-    #   - deckservice
+    depends_on:
+      - deckservice
     environment:
       - APPLICATION_PORT=${SERVICE_PORT_DISCUSSION}
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
@@ -169,8 +170,8 @@ services:
     network_mode: host
     expose:
       - "4700"
-    # depends_on:
-    #   - deckservice
+    depends_on:
+      - deckservice
     environment:
       - APPLICATION_PORT=4700
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
@@ -185,8 +186,8 @@ services:
       - "${SERVICE_PORT_FILE}"
     volumes:
       - files:/data/files
-    # depends_on:
-    #   - deckservice
+    depends_on:
+      - deckservice
     environment:
       - APPLICATION_PORT=${SERVICE_PORT_FILE}
       - APPLICATION_PATH=/data/files
@@ -199,8 +200,8 @@ services:
     expose:
       - "5000"
     depends_on:
-    #   - deckservice
-    #   - solr
+      - deckservice
+      - solr
       - searchindexer
     environment:
       - APPLICATION_PORT=5000
@@ -214,9 +215,9 @@ services:
     image: slidewiki/searchservice:latest-dev
     command: 'node worker'
     network_mode: host
-    # depends_on:
-    #   - deckservice
-    #   - solr
+    depends_on:
+      - deckservice
+      - solr
     environment:
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_USER
@@ -240,8 +241,8 @@ services:
     network_mode: host
     expose:
       - "${SERVICE_PORT_NLPSTORE}"
-    # depends_on:
-    #   - deckservice
+    depends_on:
+      - deckservice
     environment:
       - APPLICATION_PORT=${SERVICE_PORT_NLPSTORE}
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
@@ -253,7 +254,7 @@ services:
     expose:
       - "9000"
     depends_on:
-      # - deckservice
+      - deckservice
       - nlpstore
     environment:
       - APPLICATION_SECRET=sndv9sd98adpvnaa0wefe0fa04nvpdnvp9e+-.sfw03fs
@@ -265,8 +266,89 @@ services:
     network_mode: host
     expose:
       - "${SERVICE_PORT_QUESTION}"
-    # depends_on:
-    #   - deckservice
+    depends_on:
+      - deckservice
     environment:
       - APPLICATION_PORT=${SERVICE_PORT_QUESTION}
       - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+
+
+  redis:
+    network_mode: host
+    image: redis:4-alpine
+
+  xapi:
+    image: learninglocker/xapi-service:${LEARNINGLOCKER_XAPI_VERSION}
+    network_mode: host
+    expose:
+      - ${SERVICE_PORT_XAPI}
+    environment:
+      - EXPRESS_PORT=${SERVICE_PORT_XAPI}
+    depends_on:
+      - redis
+
+  learninglockerapi:
+    image: slidewiki/learninglocker2-docker
+    command: "node api/dist/server"
+    network_mode: host
+    expose:
+      - ${SERVICE_PORT_LEARNINGLOCKER_API}
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    environment:
+      - DOMAIN_NAME=${BASE_DOMAIN}
+      - APP_SECRET=${LEARNINGLOCKER_SECRET}
+      - UI_PORT=${SERVICE_PORT_LEARNINGLOCKER}
+      - API_PORT=${SERVICE_PORT_LEARNINGLOCKER_API}
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_SECURED
+      - SMTP_USER
+      - SMTP_PASS
+      - MONGO_URL=${LEARNINGLOCKER_MONGO_URL}
+    depends_on:
+      - redis
+
+  learninglockerui:
+    image: slidewiki/learninglocker2-docker
+    command: "./entrypoint-ui.sh"
+    network_mode: host
+    expose:
+      - ${SERVICE_PORT_LEARNINGLOCKER}
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    environment:
+      - DOMAIN_NAME=${BASE_DOMAIN}
+      - APP_SECRET=${LEARNINGLOCKER_SECRET}
+      - UI_PORT=${SERVICE_PORT_LEARNINGLOCKER}
+      - API_PORT=${SERVICE_PORT_LEARNINGLOCKER_API}
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_SECURED
+      - SMTP_USER
+      - SMTP_PASS
+      - MONGO_URL=${LEARNINGLOCKER_MONGO_URL}
+    depends_on:
+      - redis
+      - learninglockerapi
+      - learninglockerworker
+
+  learninglockerworker:
+    image: slidewiki/learninglocker2-docker
+    command: "node worker/dist/server"
+    network_mode: host
+    expose: []
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    environment:
+      - DOMAIN_NAME=${BASE_DOMAIN}
+      - APP_SECRET=${LEARNINGLOCKER_SECRET}
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_SECURED
+      - SMTP_USER
+      - SMTP_PASS
+      - REDIS_HOST
+      - MONGO_URL=${LEARNINGLOCKER_MONGO_URL}
+    depends_on:
+      - redis
