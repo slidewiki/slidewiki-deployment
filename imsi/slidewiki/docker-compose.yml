@@ -17,6 +17,17 @@ services:
     environment:
       - BASENAME=${BASE_DOMAIN}
 
+  maildev: 
+    image: djfarrelly/maildev
+    command: "bin/maildev --web 80 --smtp ${SMTP_PORT} --incoming-user ${SMTP_USER} --incoming-pass ${SMTP_PASS}"
+    expose:
+      - ${SMTP_PORT}
+      - 80
+    environment:
+      - VIRTUAL_HOST=maildev.${BASE_DOMAIN}
+      - VIRTUAL_PORT=80
+
+
   platform:
     image: slidewiki/platform:${SLIDEWIKI_VERSION}
     expose:
@@ -81,7 +92,7 @@ services:
       - VIRTUAL_HOST=webrtc.${BASE_DOMAIN}
       - APPLICATION_PORT=80
     volumes:
-      - /data/slidewiki/slidewiki-deployment/imsi/slidewiki/signalingservice/twitterConfig.json:/nodeApp/config.json:ro
+      - /data/slidewiki/slidewiki-deployment/docker-compose/signalingservice/twitterConfig.json:/nodeApp/config.json:ro
 
   activitiesservice:
     image: slidewiki/activitiesservice:${SLIDEWIKI_VERSION}
@@ -133,7 +144,7 @@ services:
   userservice:
     image: slidewiki/userservice:${SLIDEWIKI_VERSION}
     volumes:
-      - /data/slidewiki/slidewiki-deployment/imsi/slidewiki/userservice/providerConfig.json:/nodeApp/config.json:ro
+      - /data/slidewiki/slidewiki-deployment/docker-compose/userservice/providerConfig.json:/nodeApp/config.json:ro
     expose:
       - 80
     environment:
@@ -273,9 +284,9 @@ services:
       - API_PORT=${SERVICE_PORT_LEARNINGLOCKER_API}
       - SMTP_HOST
       - SMTP_PORT
-      - SMTP_SECURED
       - SMTP_USER
       - SMTP_PASS
+      - SMTP_IGNORE_TLS
       - MONGO_URL=${LEARNINGLOCKER_MONGO_URL}
     depends_on:
       - redis
@@ -295,11 +306,6 @@ services:
       - UI_PORT=${SERVICE_PORT_LEARNINGLOCKER}
       - API_PORT=${SERVICE_PORT_LEARNINGLOCKER_API}
       - API_HOST=learninglockerapi
-      - SMTP_HOST
-      - SMTP_PORT
-      - SMTP_SECURED
-      - SMTP_USER
-      - SMTP_PASS
       - MONGO_URL=${LEARNINGLOCKER_MONGO_URL}
     depends_on:
       - redis
@@ -315,11 +321,6 @@ services:
     environment:
       - DOMAIN_NAME=${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
-      - SMTP_HOST
-      - SMTP_PORT
-      - SMTP_SECURED
-      - SMTP_USER
-      - SMTP_PASS
       - REDIS_HOST
       - MONGO_URL=${LEARNINGLOCKER_MONGO_URL}
     depends_on:
