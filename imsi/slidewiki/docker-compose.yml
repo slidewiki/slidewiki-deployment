@@ -2,26 +2,23 @@ version: '2'
 
 volumes:
 
-  solr-data:
-  solr-data-nlp:
   learninglocker-data:
   files:
     external: true
 
 services:
 
-  solr:
-    image: slidewiki/solr:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "8983"
-    volumes: 
-      - solr-data:/solr-data
-      - solr-data-nlp:/solr-data-nlp
+  webserver:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - BASENAME=${BASE_DOMAIN}
 
   platform:
     image: slidewiki/platform:${SLIDEWIKI_VERSION}
-    network_mode: host
     expose:
       - 3000
     depends_on:
@@ -38,24 +35,24 @@ services:
       - questionservice
       - nlpservice
     environment:
-      - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=6LdNLyYTAAAAAFMC0J_zuVI1b9lXWZjPH6WLe-vJ
-      - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=6LdNLyYTAAAAAINDsVZRKG_E3l3Dvpp5sKboR1ET
+      - VIRTUAL_HOST=${BASE_DOMAIN}
+      - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=${RECAPTCHA_PRIVATE_KEY}
+      - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=${RECAPTCHA_PUBLIC_KEY}
       - SERVICE_USER_APIKEY
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-      - SERVICE_URL_DISCUSSION=${BASE_SERVICE_URL}:{SERVICE_PORT_DISCUSSION}
-      - SERVICE_URL_ACTIVITIES=${BASE_SERVICE_URL}:{SERVICE_PORT_ACTIVITIES}
-      - SERVICE_URL_NOTIFICATION=${BASE_SERVICE_URL}:{SERVICE_PORT_NOTIFICATION}
-      - SERVICE_URL_TAG=${BASE_SERVICE_URL}:{SERVICE_PORT_TAG}
-      - SERVICE_URL_QUESTION=${BASE_SERVICE_URL}:{SERVICE_PORT_QUESTION}
-      - SERVICE_URL_USER
-      - SERVICE_URL_FILE
+      - SERVICE_URL_DECK
+      - SERVICE_URL_DISCUSSION
+      - SERVICE_URL_ACTIVITIES
+      - SERVICE_URL_NOTIFICATION
+      - SERVICE_URL_TAG
+      - SERVICE_URL_QUESTION
       - SERVICE_URL_SEARCH
-      - SERVICE_URL_PDF
-      - SERVICE_URL_SIGNALING
-      - SERVICE_URL_IMPORT
-      - SERVICE_VAR_IMPORT_HOST
-      - SERVICE_PROTOCOL_IMPORT
-      - SERVICE_PORT_IMPORT
+      - SERVICE_URL_USER=http://users.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://files.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdf.${BASE_DOMAIN}
+      - SERVICE_URL_SIGNALING=http://webrtc.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=http://import.${BASE_DOMAIN}/importPPTX
+      - SERVICE_LEARNINGLOCKER_API_URL
+      - SERVICE_LEARNINGLOCKER_API_AUTH
       - SMTP_PORT
       - SMTP_HOST
       - SMTP_FROM
@@ -65,47 +62,38 @@ services:
 
   deckservice:
     image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_DECK}"
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_DECK}
-      - SECRET_REVIEW_KEY
-      - SERVICE_URL_FILE
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_USER
+      - SERVICE_URL_FILE
+      - SECRET_REVIEW_KEY
       - JWT_SERIAL
 
   unoconvservice:
     image: zrrrzzt/docker-unoconv-webservice
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_UNOCONV}"
     environment:
-      - SERVER_PORT=${SERVICE_PORT_UNOCONV}
       - PAYLOAD_MAX_SIZE=314572800
 
   signalingservice:
     image: slidewiki/webrtcsignalingservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_SIGNALING}"
-    volumes:
-      - ./signalingservice/twitterConfig.json:/nodeApp/config.json:ro
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_SIGNALING}
+      - VIRTUAL_HOST=webrtc.${BASE_DOMAIN}
+      - APPLICATION_PORT=80
+    volumes:
+      - /data/slidewiki/slidewiki-deployment/imsi/slidewiki/signalingservice/twitterConfig.json:/nodeApp/config.json:ro
 
   activitiesservice:
     image: slidewiki/activitiesservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_ACTIVITIES}"
     depends_on:
       - deckservice
       - notificationservice
+      - xapi
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_ACTIVITIES}
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-      - SERVICE_URL_NOTIFICATION=${BASE_SERVICE_URL}:{SERVICE_PORT_NOTIFICATION}
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
+      - SERVICE_URL_DECK
+      - SERVICE_URL_NOTIFICATION
       - SERVICE_URL_USER
       - URL_PLATFORM=http://${BASE_DOMAIN}
       - LRS_ENDPOINT
@@ -114,50 +102,44 @@ services:
 
   discussionservice:
     image: slidewiki/discussionservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_DISCUSSION}"
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_DISCUSSION}
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
+      - SERVICE_URL_DECK
       - SERVICE_URL_USER
 
   notificationservice:
     image: slidewiki/notificationservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_NOTIFICATION}"
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_NOTIFICATION}
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_USER
 
   importservice:
     image: slidewiki/importservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_IMPORT}"
     depends_on:
-      # - deckservice
+      - deckservice
       - fileservice
       - unoconvservice
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_IMPORT}
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-      - SERVICE_URL_UNOCONV=${BASE_SERVICE_URL}:${SERVICE_PORT_UNOCONV}
-      - SERVICE_URL_FILE
+      - APPLICATION_PORT=80
+      - SERVICE_URL_DECK
+      - SERVICE_URL_UNOCONV
+      - SERVICE_URL_FILE=http://files.${BASE_DOMAIN}
       - JWT_SERIAL
 
   userservice:
     image: slidewiki/userservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "4100"
     volumes:
-      - ./userservice/providerConfig.json:/nodeApp/config.json
+      - /data/slidewiki/slidewiki-deployment/imsi/slidewiki/userservice/providerConfig.json:/nodeApp/config.json:ro
+    expose:
+      - 80
     environment:
-      - APPLICATION_PORT=4100
+      - VIRTUAL_HOST=users.${BASE_DOMAIN}
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
       - URL_PLATFORM=http://${BASE_DOMAIN}
       - NODE_TLS_REJECT_UNAUTHORIZED=0
       - APIKEY=${SERVICE_USER_APIKEY}
@@ -171,59 +153,53 @@ services:
 
   pdfservice:
     image: slidewiki/pdfservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "4700"
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=4700
+      - VIRTUAL_HOST=pdf.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-      - SERVICE_URL_PDF
+      - SERVICE_URL_PDF=http://pdf.${BASE_DOMAIN}
+      - SERVICE_URL_DECK
       - SERVICE_URL_USER
 
   fileservice:
     image: slidewiki/fileservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_FILE}"
     volumes:
       - files:/data/files
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_FILE}
+      - VIRTUAL_HOST=files.${BASE_DOMAIN}
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
       - APPLICATION_PATH=/data/files
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
+      - SERVICE_URL_DECK
 
   searchservice:
     image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "5000"
     depends_on:
+      # - solr
       - deckservice
-      - solr
       - searchindexer
     environment:
-      - APPLICATION_PORT=5000
+      - DATABASE_URL=${MONGODB_HOST}
+      - APPLICATION_PORT=80
       - SOLR_CORE=swikcore
       - SOLR_HOST
       - SOLR_CONFIG_PORT
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - SERVICE_URL_DECK
       - SERVICE_URL_USER
 
   searchindexer:
     image: slidewiki/searchservice:latest-dev
     command: 'node worker'
-    network_mode: host
     depends_on:
+      # - solr
       - deckservice
-      - solr
     environment:
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
+      - DATABASE_URL=${MONGODB_HOST}
+      - SERVICE_URL_DECK
       - SERVICE_URL_USER
       - SOLR_CORE=swikcore
       - SOLR_HOST
@@ -234,72 +210,63 @@ services:
 
   tagservice:
     image: slidewiki/tagservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_TAG}"
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_TAG}
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
 
   nlpstore:
     image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_NLPSTORE}"
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_NLPSTORE}
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-      - SERVICE_URL_NLP=${BASE_SERVICE_URL}:9000
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
+      - SERVICE_URL_DECK
+      - SERVICE_URL_NLP
 
   nlpservice:
     image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "9000"
     depends_on:
       - deckservice
       - nlpstore
     environment:
-      - APPLICATION_SECRET=sndv9sd98adpvnaa0wefe0fa04nvpdnvp9e+-.sfw03fs
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-      - SERVICE_URL_NLPSTORE=${BASE_SERVICE_URL}:${SERVICE_PORT_NLPSTORE}
+      - APPLICATION_SECRET=${SERVICE_NLP_SECRET}
+      - SERVICE_URL_DECK
+      - SERVICE_URL_NLPSTORE
 
   questionservice:
     image: slidewiki/questionservice:${SLIDEWIKI_VERSION}
-    network_mode: host
-    expose:
-      - "${SERVICE_PORT_QUESTION}"
     depends_on:
       - deckservice
     environment:
-      - APPLICATION_PORT=${SERVICE_PORT_QUESTION}
-      - SERVICE_URL_DECK=${BASE_SERVICE_URL}:${SERVICE_PORT_DECK}
-
+      - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
+      - SERVICE_URL_DECK
 
   redis:
-    network_mode: host
     image: redis:4-alpine
 
   xapi:
     image: learninglocker/xapi-service:${LEARNINGLOCKER_XAPI_VERSION}
-    network_mode: host
     expose:
-      - ${SERVICE_PORT_XAPI}
+      - 80
     environment:
-      - EXPRESS_PORT=${SERVICE_PORT_XAPI}
+      - EXPRESS_PORT=80
+      - MONGO_URL=${LEARNINGLOCKER_MONGO_URL}
+      - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
 
   learninglockerapi:
-    image: slidewiki/learninglocker2-docker
+    image: slidewiki/learninglocker2-app:${SLIDEWIKI_VERSION}
     command: "node api/dist/server"
-    network_mode: host
     expose:
       - ${SERVICE_PORT_LEARNINGLOCKER_API}
     volumes:
       - learninglocker-data:/opt/learninglocker/storage
     environment:
+      - VIRTUAL_HOST=api.learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=${SERVICE_PORT_LEARNINGLOCKER_API}
       - DOMAIN_NAME=${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
       - UI_PORT=${SERVICE_PORT_LEARNINGLOCKER}
@@ -314,18 +281,20 @@ services:
       - redis
 
   learninglockerui:
-    image: slidewiki/learninglocker2-docker
+    image: slidewiki/learninglocker2-app:${SLIDEWIKI_VERSION}
     command: "./entrypoint-ui.sh"
-    network_mode: host
     expose:
       - ${SERVICE_PORT_LEARNINGLOCKER}
     volumes:
       - learninglocker-data:/opt/learninglocker/storage
     environment:
+      - VIRTUAL_HOST=learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=${SERVICE_PORT_LEARNINGLOCKER}
       - DOMAIN_NAME=${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
       - UI_PORT=${SERVICE_PORT_LEARNINGLOCKER}
       - API_PORT=${SERVICE_PORT_LEARNINGLOCKER_API}
+      - API_HOST=learninglockerapi
       - SMTP_HOST
       - SMTP_PORT
       - SMTP_SECURED
@@ -338,9 +307,8 @@ services:
       - learninglockerworker
 
   learninglockerworker:
-    image: slidewiki/learninglocker2-docker
+    image: slidewiki/learninglocker2-app:${SLIDEWIKI_VERSION}
     command: "node worker/dist/server"
-    network_mode: host
     expose: []
     volumes:
       - learninglocker-data:/opt/learninglocker/storage
