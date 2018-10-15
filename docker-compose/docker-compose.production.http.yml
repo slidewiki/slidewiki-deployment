@@ -97,6 +97,9 @@ services:
       - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=http://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_QUESTION=http://questionservice.${BASE_DOMAIN}
+      - SERVICE_URL_SIGNALING=http://signalingservice.${BASE_DOMAIN}
+      - SERVICE_LEARNINGLOCKER_API_URL=http://learninglockerapi
+      - SERVICE_LEARNINGLOCKER_API_AUTH
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=http
       - SERVICE_PORT_IMPORT=80
@@ -428,7 +431,7 @@ services:
   learninglockerapi:
     environment:
       - VIRTUAL_HOST=api.learninglocker.${BASE_DOMAIN}
-      - VIRTUAL_PORT=8080
+      - VIRTUAL_PORT=80
       - SMTP_HOST
       - SMTP_PORT
       - SMTP_USER

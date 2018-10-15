@@ -384,7 +384,7 @@ services:
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
       - MONGO_URL=mongodb://mongodb:27017/learninglocker_v2
       - UI_PORT=3000
-      - API_PORT=8080
+      - API_PORT=80
       - API_HOST=learninglockerapi
     restart: unless-stopped
     depends_on:
@@ -396,7 +396,7 @@ services:
     image: slidewiki/learninglocker2-docker:latest
     command: "node api/dist/server"
     expose:
-      - 8080
+      - 80
     networks:
       - front-trier
       - back-trier
@@ -404,7 +404,7 @@ services:
       - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
       - MONGO_URL=mongodb://mongodb:27017/learninglocker_v2
-      - API_PORT=8080
+      - API_PORT=80
     restart: unless-stopped
     depends_on:
       - redis

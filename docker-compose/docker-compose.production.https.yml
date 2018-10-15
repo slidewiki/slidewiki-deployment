@@ -113,6 +113,8 @@ services:
       - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_QUESTION=https://questionservice.${BASE_DOMAIN}
       - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
+      - SERVICE_LEARNINGLOCKER_API_URL=http://learninglockerapi
+      - SERVICE_LEARNINGLOCKER_API_AUTH
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=https
       - SERVICE_PORT_IMPORT=443
@@ -498,7 +500,7 @@ services:
   learninglockerapi:
     environment:
       - VIRTUAL_HOST=api.learninglocker.${BASE_DOMAIN}
-      - VIRTUAL_PORT=8080
+      - VIRTUAL_PORT=80
       - LETSENCRYPT_HOST=api.learninglocker.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - SMTP_HOST
