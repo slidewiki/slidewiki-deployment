@@ -414,6 +414,7 @@ services:
   learninglocker:
     environment:
       - VIRTUAL_HOST=learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=3000
     depends_on:
       - logger
     volumes:
@@ -427,6 +428,7 @@ services:
   learninglockerapi:
     environment:
       - VIRTUAL_HOST=api.learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=8080
       - SMTP_HOST
       - SMTP_PORT
       - SMTP_USER

@@ -482,6 +482,7 @@ services:
   learninglocker:
     environment:
       - VIRTUAL_HOST=learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=learninglocker.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     depends_on:
@@ -497,6 +498,7 @@ services:
   learninglockerapi:
     environment:
       - VIRTUAL_HOST=api.learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=8080
       - LETSENCRYPT_HOST=api.learninglocker.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - SMTP_HOST
