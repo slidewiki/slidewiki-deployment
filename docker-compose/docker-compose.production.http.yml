@@ -186,7 +186,7 @@ services:
       - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
       - URL_PLATFORM=http://${BASE_DOMAIN}
-      - LRS_ENDPOINT=http://xapi
+      - LRS_ENDPOINT=http://xapi/data/xAPI
       - LRS_PUBLIC_KEY=${XAPI_CLIENT_KEY}
       - LRS_SECRET=${XAPI_CLIENT_SECRET}
     depends_on:
