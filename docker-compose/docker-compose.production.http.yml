@@ -422,7 +422,7 @@ services:
       driver: fluentd
       options:
         fluentd-address: "localhost:24224"
-        tag: "slidewiki.learninglocker"
+        tag: "slidewiki.learninglockerui"
 
   learninglockerapi:
     environment:
