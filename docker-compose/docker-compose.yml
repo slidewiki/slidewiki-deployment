@@ -135,6 +135,7 @@ services:
       - deckservice
       - notificationservice
       - userservice
+      - xapi
       - mongodb
 
   notificationservice:
@@ -355,61 +356,65 @@ services:
   xapi:
     image: learninglocker/xapi-service:2.2.7
     restart: unless-stopped
+    expose:
+      - 80
     environment:
       - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
       - REDIS_URL=redis://redis:6379/0
-      - VIRTUAL_PORT=8081
-    expose:
-      - 8081
+      - EXPRESS_PORT=80
     networks:
       - front-trier
       - back-trier
     depends_on:
       - mongodb
       - redis
+
+  learninglocker:
+    image: slidewiki/learninglocker2-docker:latest
+    command: "./entrypoint-ui.sh"
+    expose:
+      - 3000
+    environment:
+      - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
+      - APP_SECRET=${LEARNINGLOCKER_SECRET}
+      - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
+      - UI_PORT=3000
+      - API_PORT=8080
+      - API_HOST=learninglockerapi
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - learninglockerapi
+      - mongodb
 
   learninglockerapi:
     image: slidewiki/learninglocker2-docker:latest
+    command: "node api/dist/server"
+    expose:
+      - 8080
     environment:
       - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
       - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
-      - VIRTUAL_PORT=8080
-    expose:
-      - 8080
-    command: "node api/dist/server"
+      - API_PORT=8080
     restart: unless-stopped
     networks:
       - front-trier
       - back-trier
     depends_on:
-      - mongodb
       - redis
-
-  learninglockerui:
-    image: slidewiki/learninglocker2-docker:latest
-    environment:
-      - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
-      - APP_SECRET=${LEARNINGLOCKER_SECRET}
-      - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
-      - VIRTUAL_PORT=8080
-    expose:
-      - 8080
-    command: "./entrypoint-ui.sh"
-    restart: unless-stopped
-    depends_on:
+      - learninglockerworker
       - mongodb
-      - redis
-      - learninglockerapi
 
   learninglockerworker:
     image: slidewiki/learninglocker2-docker:latest
+    command: "node worker/dist/server"
+    expose: []
     environment:
       - DOMAIN_NAME=learninglocker.${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
       - MONGO_URL=mongodb://mongo:27017/learninglocker_v2
-    command: "node worker/dist/server"
     restart: unless-stopped
     depends_on:
-      - mongodb
       - redis
+      - mongodb
