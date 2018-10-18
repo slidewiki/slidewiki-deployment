@@ -367,7 +367,7 @@ services:
     expose:
       - "8080"
     depends_on:
-      activitiesservice
+      - activitiesservice
 
   questionservice:
     image: slidewiki/questionservice:${SLIDEWIKI_VERSION}
