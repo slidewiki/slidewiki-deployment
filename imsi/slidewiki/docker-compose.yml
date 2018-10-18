@@ -77,6 +77,7 @@ services:
       - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}/importPPTX
       - SERVICE_URL_NLP=http://nlpservice:9000
       - SERVICE_URL_ANALYTICS=http://analyticsservice:8080
+      - SERVICE_URL_RECOMMENDER=http://recommenderservice:8000
       - SERVICE_LEARNINGLOCKER_API_URL
       - SERVICE_LEARNINGLOCKER_API_AUTH
       - SMTP_PORT
@@ -305,6 +306,27 @@ services:
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
+
+
+  recommenderservice:
+    image: slidewiki/recommenderservice:latest-dev
+    environment:
+      - VIRTUAL_HOST=recommenderservice.${BASE_DOMAIN}
+      - FLASK_SERVER_NAME=recommenderservice.${BASE_DOMAIN}
+      - MAX_FEATURES=2000
+      - SERVICE_URL_DECK
+      - SERVICE_URL_USER
+      - SERVICE_URL_ACTIVITIES
+      - SERVICE_URL_NLP=http://nlpservice:9000
+    volumes:
+      - /data/slidewiki/recommender-service/data:/data
+    depends_on:
+      - deckservice
+      - userservice
+      - activitiesservice
+      - nlpservice
+      - nlpstore
+
 
   analyticsservice:
     image: slidewiki/analyticsservice:${SLIDEWIKI_VERSION}
