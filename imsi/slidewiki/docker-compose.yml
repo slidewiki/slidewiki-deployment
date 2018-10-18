@@ -27,6 +27,16 @@ services:
       - VIRTUAL_HOST=maildev.${BASE_DOMAIN}
       - VIRTUAL_PORT=80
 
+  agendash:
+    image: lgatica/docker-agendash
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - VIRTUAL_HOST=agendash.${BASE_DOMAIN}
+      - MONGODB_URI=mongodb://${BASE_DOMAIN}:27017/slidewiki
+      - MONGODB_COLLECTION=agendaJobs
+
 
   platform:
     image: slidewiki/platform:${SLIDEWIKI_VERSION}
@@ -57,11 +67,11 @@ services:
       - SERVICE_URL_TAG
       - SERVICE_URL_QUESTION
       - SERVICE_URL_SEARCH
-      - SERVICE_URL_USER=http://users.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=http://files.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdf.${BASE_DOMAIN}
-      - SERVICE_URL_SIGNALING=http://webrtc.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=http://import.${BASE_DOMAIN}/importPPTX
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_SIGNALING=http://signalingservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}/importPPTX
       - SERVICE_LEARNINGLOCKER_API_URL
       - SERVICE_LEARNINGLOCKER_API_AUTH
       - SMTP_PORT
@@ -74,6 +84,7 @@ services:
   deckservice:
     image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
     environment:
+      - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_USER
@@ -89,7 +100,7 @@ services:
   signalingservice:
     image: slidewiki/webrtcsignalingservice:${SLIDEWIKI_VERSION}
     environment:
-      - VIRTUAL_HOST=webrtc.${BASE_DOMAIN}
+      - VIRTUAL_HOST=signalingservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
     volumes:
       - /data/slidewiki/slidewiki-deployment/docker-compose/signalingservice/twitterConfig.json:/nodeApp/config.json:ro
@@ -101,6 +112,7 @@ services:
       - notificationservice
       - xapi
     environment:
+      - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
@@ -116,6 +128,7 @@ services:
     depends_on:
       - deckservice
     environment:
+      - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
@@ -124,6 +137,7 @@ services:
   notificationservice:
     image: slidewiki/notificationservice:${SLIDEWIKI_VERSION}
     environment:
+      - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_USER
@@ -135,10 +149,11 @@ services:
       - fileservice
       - unoconvservice
     environment:
+      - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - SERVICE_URL_DECK
       - SERVICE_URL_UNOCONV
-      - SERVICE_URL_FILE=http://files.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
       - JWT_SERIAL
 
   userservice:
@@ -148,7 +163,7 @@ services:
     expose:
       - 80
     environment:
-      - VIRTUAL_HOST=users.${BASE_DOMAIN}
+      - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - URL_PLATFORM=http://${BASE_DOMAIN}
@@ -167,9 +182,9 @@ services:
     depends_on:
       - deckservice
     environment:
-      - VIRTUAL_HOST=pdf.${BASE_DOMAIN}
+      - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdf.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK
       - SERVICE_URL_USER
 
@@ -180,7 +195,7 @@ services:
     depends_on:
       - deckservice
     environment:
-      - VIRTUAL_HOST=files.${BASE_DOMAIN}
+      - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - APPLICATION_PATH=/data/files
@@ -194,6 +209,7 @@ services:
       - deckservice
       - searchindexer
     environment:
+      - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
       - DATABASE_URL=${MONGODB_HOST}
       - APPLICATION_PORT=80
       - SOLR_CORE=swikcore
@@ -222,25 +238,36 @@ services:
   tagservice:
     image: slidewiki/tagservice:${SLIDEWIKI_VERSION}
     environment:
+      - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
 
   nlpstore:
     image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
     depends_on:
+      # - solr
       - deckservice
     environment:
+      - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
-      - SERVICE_URL_NLP
+      - SERVICE_URL_NLP=http://nlpservice:9000
+      - SOLR_CORE=swiknlp
+      - SOLR_HOST
+      - SOLR_CONFIG_PORT
+      - AGENDA_JOBS_COLLECTION=agendaJobs
+      - AGENDA_JOBS_CONCURRENCY=1
 
   nlpservice:
     image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
+    expose:
+      - 9000
     depends_on:
       - deckservice
       - nlpstore
     environment:
+      - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
       - APPLICATION_SECRET=${SERVICE_NLP_SECRET}
       - SERVICE_URL_DECK
       - SERVICE_URL_NLPSTORE
@@ -250,6 +277,7 @@ services:
     depends_on:
       - deckservice
     environment:
+      - VIRTUAL_HOST=questionservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
