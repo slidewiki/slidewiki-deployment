@@ -64,6 +64,8 @@ services:
       - tagservice
       - signalingservice
       - questionservice
+      - recommenderservice
+      - analyticsservice
 
   deckservice:
     image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
@@ -331,7 +333,7 @@ services:
 
   nlpservice:
     image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
-    restart: on-failure:5
+    restart: always
     networks:
       - front-trier
       - back-trier
@@ -341,6 +343,31 @@ services:
       - deckservice
       - nlpstore
 
+  recommenderservice:
+    image: slidewiki/recommenderservice:${SLIDEWIKI_VERSION}
+    restart: always
+    networks:
+      - front-trier
+      - back-trier
+    expose:
+      - "8000"
+    depends_on:
+      - deckservice
+      - userservice
+      - activitiesservice
+      - nlpservice
+      - nlpstore
+
+  analyticsservice:
+    image: slidewiki/analyticsservice:${SLIDEWIKI_VERSION}
+    restart: always
+    networks:
+      - front-trier
+      - back-trier
+    expose:
+      - "8080"
+    depends_on:
+      activitiesservice
 
   questionservice:
     image: slidewiki/questionservice:${SLIDEWIKI_VERSION}

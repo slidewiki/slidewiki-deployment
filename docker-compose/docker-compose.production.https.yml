@@ -4,6 +4,7 @@ volumes:
 
   mongo-data: {}
   solr-data: {}
+  recommender-data: {}
   files: {}
   certs: {}
 
@@ -114,6 +115,8 @@ services:
       - SERVICE_URL_QUESTION=https://questionservice.${BASE_DOMAIN}
       - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
       - SERVICE_URL_NLP=https://nlpservice.${BASE_DOMAIN}
+      - SERVICE_URL_ANALYTICS=https://analyticsservice.${BASE_DOMAIN}
+      - SERVICE_URL_RECOMMENDER=https://recommenderservice.${BASE_DOMAIN}
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=https
       - SERVICE_PORT_IMPORT=443
@@ -424,6 +427,39 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpservice"
+
+  recommenderservice:
+    environment:
+      - VIRTUAL_HOST=recommenderservice.${BASE_DOMAIN}
+      - FLASK_SERVER_NAME=recommenderservice.${BASE_DOMAIN}
+      - MAX_FEATURES=2000
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLP=https://nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=recommenderservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    volumes:
+      - recommender-data:/data
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.recommenderservice"
+
+  analyticsservice:
+    environment:
+      - VIRTUAL_HOST=analyticsservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=analyticsservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.analyticsservice"
 
   questionservice:
     environment:
