@@ -54,8 +54,10 @@ services:
       - tagservice
       - signalingservice
       - questionservice
-      - nlpservice
       - analyticsservice
+      - nlpservice
+      - searchindexer
+      - nlpstoreupdater
     environment:
       - VIRTUAL_HOST=${BASE_DOMAIN}
       - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=${RECAPTCHA_PRIVATE_KEY}
@@ -210,7 +212,6 @@ services:
     depends_on:
       # - solr
       - deckservice
-      - searchindexer
     environment:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
       - DATABASE_URL=${MONGODB_HOST}
@@ -245,14 +246,42 @@ services:
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
 
-  nlpstore:
-    image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+  nlpservice:
+    image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
+    expose:
+      - 9000
+    environment:
+      - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
+      - APPLICATION_SECRET=${SERVICE_NLP_SECRET}
+      - SERVICE_URL_DECK
+      - SERVICE_URL_NLPSTORE
     depends_on:
-      # - solr
       - deckservice
+      - nlpstore
+
+  nlpstore:
+    image: slidewiki/nlpstore:latest-dev
+    expose:
+      - 80
     environment:
       - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
       - APPLICATION_PORT=80
+      - DATABASE_URL=${MONGODB_HOST}
+      - SERVICE_URL_DECK
+      - SOLR_CORE=swiknlp
+      - SOLR_HOST
+      - SOLR_CONFIG_PORT
+      - AGENDA_JOBS_COLLECTION=agendaJobs
+      - AGENDA_JOBS_CONCURRENCY=1
+    depends_on:
+      # - solr
+      - deckservice
+
+  nlpstoreupdater:
+    image: slidewiki/nlpstore:latest-dev
+    command: 'node worker'
+    environment:
+      - DATABASE_PORT=27017
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
       - SERVICE_URL_NLP=http://nlpservice:9000
@@ -261,19 +290,11 @@ services:
       - SOLR_CONFIG_PORT
       - AGENDA_JOBS_COLLECTION=agendaJobs
       - AGENDA_JOBS_CONCURRENCY=1
-
-  nlpservice:
-    image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}
-    expose:
-      - 9000
+      - JOB_TYPES=nlpUpdate
     depends_on:
+      # - solr
       - deckservice
-      - nlpstore
-    environment:
-      - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
-      - APPLICATION_SECRET=${SERVICE_NLP_SECRET}
-      - SERVICE_URL_DECK
-      - SERVICE_URL_NLPSTORE
+      - nlpservice
 
   questionservice:
     image: slidewiki/questionservice:${SLIDEWIKI_VERSION}
