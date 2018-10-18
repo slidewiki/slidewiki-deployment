@@ -300,6 +300,28 @@ services:
       - DATABASE_URL=mongodb
     depends_on:
       - mongodb
+      - solr
+      - nlpindexer
+
+  nlpindexer:
+    image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+    restart: always
+    command: 'node worker'
+    networks:
+      - back-trier
+    environment:
+      - DATABASE_PORT=27017
+      - DATABASE_URL=mongodb
+      - SOLR_CORE=swiknlp
+      - SOLR_HOST=solr
+      - AGENDA_JOBS_COLLECTION=agendaJobs
+      - AGENDA_JOBS_CONCURRENCY=1
+      - JOB_TYPES=nlpUpdate
+    depends_on:
+      - deckservice
+      - nlpservice
+      - solr
+      - mongodb
 
 #  nlpservice:
 #    image: slidewiki/nlpservice:${SLIDEWIKI_VERSION}

@@ -384,16 +384,6 @@ services:
   nlpstore:
     environment:
       - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -405,6 +395,18 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpstore"
 
+  nlpindexer:
+    environment:
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLP=https://nlpservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpindexer"
+        
 #  nlpservice:
 #    environment:
 #      - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
