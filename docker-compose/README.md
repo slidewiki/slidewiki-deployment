@@ -23,6 +23,12 @@ The `.env` file holds the basic configuration of the SlideWiki deployment. It de
 - `JWT_SERIAL` JWT Ssrial for services
 - `SMTP_FROM` email address used when SlideWiki sends out registration/password reset mails.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_CLIENTNAME` hostname, port of SMTP server to use when sending mails and FQDN of sending machine (optional).
+- `SMTP_USER`, `SMTP_PASS` username, password of SMTP server sending emails
+- `SMTP_SECURED`, `SMTP_IGNORE_TLS` flags for the tls options when sending emails https://nodemailer.com/smtp/
+- `LEARNINGLOCKER_SECRET` LearningLocker's origin setting: Unique string used for hashing, Recommended length - 256 bits
+- `XAPI_CLIENT_KEY` the client key used for writing statements to LearningLocker xAPI service
+- `XAPI_CLIENT_SECRET` the client secret used for writing statements to LearningLocker xAPI service
+- `SERVICE_LEARNINGLOCKER_API_AUTH` the client auth header used for reading statements from LearningLocker API
 - `MAINTENANCE_DIR` directory where the backups are stored and served from (`MAINTENACE_DIR/(db|files)`). By default the logger is configured to store the logs under `MAINTENACE_DIR/log` so they are also accessible via HTTP.
 - LTI_ID
 - LTI_KEY

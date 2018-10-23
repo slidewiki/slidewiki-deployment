@@ -4,13 +4,17 @@ volumes:
 
   mongo-data: {}
   solr-data: {}
+  learninglocker-data: {}
   recommender-data: {}
   files: {}
   certs: {}
 
 services:
 
-  # for production: image that pulls backups and provides access to backups and logs via HTTP
+  ##
+  ##  Infrastructure services
+  ##
+
   maintenance:
     image: slidewiki/maintenance:${SLIDEWIKI_VERSION}
     restart: always
@@ -31,7 +35,6 @@ services:
       - mongodb
       - logger
 
-  # for production: let's encrypt companion for automatically acquiring TLS certs
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     restart: always
@@ -41,7 +44,7 @@ services:
     volumes_from:
       - webserver
 
-  # for production: Fluentd based logging
+  # Fluentd based logging
   logger:
     image: slidewiki/logger:latest
     restart: always
@@ -81,6 +84,15 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.solr"
 
+  redis:
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.redis"
+
   webserver:
     environment:
       - BASENAME=${BASE_DOMAIN}
@@ -99,6 +111,10 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.webserver"
 
+  ##
+  ##  SlideWiki Platform
+  ##
+
   platform:
     environment:
       - VIRTUAL_HOST=${BASE_DOMAIN},www.${BASE_DOMAIN}
@@ -114,6 +130,8 @@ services:
       - SERVICE_URL_TAG=https://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_QUESTION=https://questionservice.${BASE_DOMAIN}
       - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
+      - SERVICE_LEARNINGLOCKER_API_URL=http://learninglockerapi
+      - SERVICE_LEARNINGLOCKER_API_AUTH
       - SERVICE_URL_NLP=https://nlpservice.${BASE_DOMAIN}
       - SERVICE_URL_ANALYTICS=https://analyticsservice.${BASE_DOMAIN}
       - SERVICE_URL_RECOMMENDER=https://recommenderservice.${BASE_DOMAIN}
@@ -183,6 +201,8 @@ services:
       - LETSENCRYPT_TEST
     volumes:
       - ./signalingservice/twitterConfig.json:/nodeApp/config.json:ro
+    depends_on:
+      - logger
     logging:
       driver: fluentd
       options:
@@ -195,6 +215,10 @@ services:
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - URL_PLATFORM=https://${BASE_DOMAIN}
+      - LRS_ENDPOINT=http://xapi/data/xAPI
+      - LRS_PUBLIC_KEY=${XAPI_CLIENT_KEY}
+      - LRS_SECRET=${XAPI_CLIENT_SECRET}
       - LETSENCRYPT_HOST=activitiesservice.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -347,20 +371,6 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.searchindexer"
 
-  #xapi:
-  #  environment:
-  #    - VIRTUAL_HOST=xapiservice.${BASE_DOMAIN}
-  #    - LETSENCRYPT_HOST=xapiservice.${BASE_DOMAIN}
-  #    - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-  #    - LETSENCRYPT_TEST=true
-  #  depends_on:
-  #    - logger
-  #  logging:
-  #    driver: fluentd
-  #    options:
-  #      fluentd-address: "localhost:24224"
-  #      tag: "slidewiki.xapi"
-
   tagservice:
     environment:
       - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
@@ -475,3 +485,76 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.questionservice"
+
+  ##
+  ##  SlideWiki Learning Analytics Services
+  ##
+
+  xapi:
+    environment:
+      - VIRTUAL_HOST=xapi.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=xapi.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.xapi"
+
+  learninglocker:
+    environment:
+      - VIRTUAL_HOST=learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    depends_on:
+      - logger
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.learninglockerui"
+
+  learninglockerapi:
+    environment:
+      - VIRTUAL_HOST=api.learninglocker.${BASE_DOMAIN}
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=api.learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASS
+      - SMTP_SECURED
+      - SMTP_IGNORE_TLS
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.learninglockerapi"
+
+  learninglockerworker:
+    environment:
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASS
+      - SMTP_SECURED
+      - SMTP_IGNORE_TLS
+    depends_on:
+      - logger
+    volumes:
+      - learninglocker-data:/opt/learninglocker/storage
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.learninglockerworker"
