@@ -97,9 +97,9 @@ services:
       - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
       - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}/importPPTX
-      - SERVICE_URL_NLP=https://nlpservice:9000
-      - SERVICE_URL_ANALYTICS=https://analyticsservice:8080
-      - SERVICE_URL_RECOMMENDER=https://recommenderservice:8000
+      - SERVICE_URL_NLP=http://nlpservice:9000
+      - SERVICE_URL_ANALYTICS=http://analyticsservice:8080
+      - SERVICE_URL_RECOMMENDER=http://recommenderservice:8000
       - SERVICE_LEARNINGLOCKER_API_URL
       - SERVICE_LEARNINGLOCKER_API_AUTH
       - SMTP_PORT
