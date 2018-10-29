@@ -5,6 +5,7 @@ volumes:
   mongo-data: {}
   solr-data: {}
   learninglocker-data: {}
+  recommender-data: {}
   files: {}
   certs: {}
 
@@ -113,6 +114,9 @@ services:
       - SERVICE_URL_SIGNALING=http://signalingservice.${BASE_DOMAIN}
       - SERVICE_LEARNINGLOCKER_API_URL=http://learninglockerapi
       - SERVICE_LEARNINGLOCKER_API_AUTH
+      - SERVICE_URL_NLP=http://nlpservice.${BASE_DOMAIN}
+      - SERVICE_URL_ANALYTICS=http://analyticsservice.${BASE_DOMAIN}
+      - SERVICE_URL_RECOMMENDER=http://recommenderservice.${BASE_DOMAIN}
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=http
       - SERVICE_PORT_IMPORT=80
@@ -338,15 +342,6 @@ services:
     environment:
       - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_SEARCH=http://searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMAGE=http://imageservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}
     depends_on:
       - logger
     logging:
@@ -355,17 +350,57 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpstore"
 
+  nlpstoreupdater:
+    environment:
+      - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLP=http://nlpservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpstoreupdater"
+
   nlpservice:
     environment:
       - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
-      - SERVICE_URL_DECK=deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_NLPSTORE=nlpstore.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLPSTORE=http://nlpstore.${BASE_DOMAIN}
       - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
     logging:
       driver: fluentd
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpservice"
+
+  recommenderservice:
+    environment:
+      - VIRTUAL_HOST=recommenderservice.${BASE_DOMAIN}
+      - FLASK_SERVER_NAME=recommenderservice.${BASE_DOMAIN}
+      - MAX_FEATURES=2000
+      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLP=http://nlpservice.${BASE_DOMAIN}
+    volumes:
+      - recommender-data:/data
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.recommenderservice"
+
+  analyticsservice:
+    environment:
+      - VIRTUAL_HOST=analyticsservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.analyticsservice"
 
   questionservice:
     environment:

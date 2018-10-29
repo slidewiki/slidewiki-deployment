@@ -5,6 +5,7 @@ volumes:
   mongo-data: {}
   solr-data: {}
   learninglocker-data: {}
+  recommender-data: {}
   files: {}
   certs: {}
 
@@ -131,6 +132,9 @@ services:
       - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
       - SERVICE_LEARNINGLOCKER_API_URL=http://learninglockerapi
       - SERVICE_LEARNINGLOCKER_API_AUTH
+      - SERVICE_URL_NLP=https://nlpservice.${BASE_DOMAIN}
+      - SERVICE_URL_ANALYTICS=https://analyticsservice.${BASE_DOMAIN}
+      - SERVICE_URL_RECOMMENDER=https://recommenderservice.${BASE_DOMAIN}
       - SERVICE_VAR_IMPORT_HOST=importservice.${BASE_DOMAIN}
       - SERVICE_PROTOCOL_IMPORT=https
       - SERVICE_PORT_IMPORT=443
@@ -395,15 +399,6 @@ services:
     environment:
       - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
       - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_DISCUSSION=https://discussionservice.${BASE_DOMAIN}
-      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=https://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_SEARCH=https://searchservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMAGE=https://imageservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - LETSENCRYPT_TEST
@@ -415,20 +410,66 @@ services:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.nlpstore"
 
-#  nlpservice:
-#    environment:
-#      - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
-#      - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
-#      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
-#      - SERVICE_URL_NLPSTORE=https://nlpstore.${BASE_DOMAIN}
-#      - LETSENCRYPT_HOST=nlpservice.${BASE_DOMAIN}
-#      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-#      - LETSENCRYPT_TEST
-#    logging:
-#      driver: fluentd
-#      options:
-#        fluentd-address: "localhost:24224"
-#        tag: "slidewiki.nlpservice"
+  nlpstoreupdater:
+    environment:
+      - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLP=https://nlpservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpstoreupdater"
+
+  nlpservice:
+    environment:
+      - APPLICATION_SECRET=${NLP_APPLICATION_SECRET}
+      - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLPSTORE=https://nlpstore.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.nlpservice"
+
+  recommenderservice:
+    environment:
+      - VIRTUAL_HOST=recommenderservice.${BASE_DOMAIN}
+      - FLASK_SERVER_NAME=recommenderservice.${BASE_DOMAIN}
+      - MAX_FEATURES=2000
+      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - SERVICE_URL_NLP=https://nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=recommenderservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    volumes:
+      - recommender-data:/data
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.recommenderservice"
+
+  analyticsservice:
+    environment:
+      - VIRTUAL_HOST=analyticsservice.${BASE_DOMAIN}
+      - SERVICE_URL_ACTIVITIES=https://activitiesservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=analyticsservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_TEST
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.analyticsservice"
 
   questionservice:
     environment:
