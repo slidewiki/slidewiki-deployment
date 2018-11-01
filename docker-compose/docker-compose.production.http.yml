@@ -104,6 +104,7 @@ services:
   platform:
     environment:
       - VIRTUAL_HOST=${BASE_DOMAIN}
+      - URL_PLATFORM=http://${BASE_DOMAIN}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
