@@ -144,6 +144,7 @@ services:
   deckservice:
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
+      - URL_PLATFORM=http://${BASE_DOMAIN}
       - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=http://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
