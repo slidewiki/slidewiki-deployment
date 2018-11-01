@@ -4,6 +4,8 @@ volumes:
 
   mongo-data: {}
   solr-data: {}
+  solr-data-nlp: {}
+  solr-data-skills: {}
   learninglocker-data: {}
   recommender-data: {}
   files: {}
@@ -58,6 +60,8 @@ services:
   solr:
     volumes:
       - solr-data:/solr-data
+      - solr-data-nlp:/solr-data-nlp
+      - solr-data-skills:/solr-data-skills
     environment:
       - VIRTUAL_HOST=solr.${BASE_DOMAIN}
     depends_on:
