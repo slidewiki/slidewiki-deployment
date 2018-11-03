@@ -53,7 +53,7 @@ The **SlideWiki Platform** client will be used for reading all statements from S
 
 1. pause background jobs
 
-    ./deployment stop learninglockerworker
+    ./deployment.sh stop learninglockerworker
 
 2. copy stuff
 
