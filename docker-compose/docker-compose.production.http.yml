@@ -174,9 +174,9 @@ services:
   activitiesservice:
     environment:
       - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
-      - SERVICE_URL_NOTIFICATION=http://notificationservice.${BASE_DOMAIN}
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice
+      - SERVICE_URL_NOTIFICATION=http://notificationservice
+      - SERVICE_URL_USER=http://userservice
       - URL_PLATFORM=http://${BASE_DOMAIN}
       - LRS_ENDPOINT=http://xapi/data/xAPI
       - LRS_PUBLIC_KEY=${XAPI_CLIENT_KEY}
@@ -314,7 +314,7 @@ services:
 
   searchindexer:
     environment:
-      - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice
     depends_on:
       - logger
     logging:
