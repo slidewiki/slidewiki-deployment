@@ -368,7 +368,7 @@ services:
 
   searchindexer:
     environment:
-      - SERVICE_URL_DECK=https://deckservice.${BASE_DOMAIN}
+      - SERVICE_URL_DECK=http://deckservice
     depends_on:
       - logger
     logging:
