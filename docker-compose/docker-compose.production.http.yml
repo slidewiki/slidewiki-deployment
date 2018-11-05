@@ -4,6 +4,8 @@ volumes:
 
   mongo-data: {}
   solr-data: {}
+  solr-data-nlp: {}
+  solr-data-skills: {}
   learninglocker-data: {}
   recommender-data: {}
   files: {}
@@ -58,6 +60,8 @@ services:
   solr:
     volumes:
       - solr-data:/solr-data
+      - solr-data-nlp:/solr-data-nlp
+      - solr-data-skills:/solr-data-skills
     environment:
       - VIRTUAL_HOST=solr.${BASE_DOMAIN}
     depends_on:
@@ -100,6 +104,7 @@ services:
   platform:
     environment:
       - VIRTUAL_HOST=${BASE_DOMAIN}
+      - URL_PLATFORM=http://${BASE_DOMAIN}
       - SERVICE_URL_DECK=http://deckservice.${BASE_DOMAIN}
       - SERVICE_URL_DISCUSSION=http://discussionservice.${BASE_DOMAIN}
       - SERVICE_URL_ACTIVITIES=http://activitiesservice.${BASE_DOMAIN}
@@ -140,6 +145,7 @@ services:
   deckservice:
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
+      - URL_PLATFORM=http://${BASE_DOMAIN}
       - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=http://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}

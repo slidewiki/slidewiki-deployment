@@ -39,6 +39,3 @@ jspm_packages
 #custom
 certs
 database
-docker-compose/htpasswd
-docker-compose/userservice
-providerConfig*
