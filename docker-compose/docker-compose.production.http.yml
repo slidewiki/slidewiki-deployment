@@ -116,6 +116,7 @@ services:
       - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=http://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_QUESTION=http://questionservice.${BASE_DOMAIN}
+      - SERVICE_URL_TRANSLATION=http://translationservice.${BASE_DOMAIN}
       - SERVICE_URL_SIGNALING=http://signalingservice.${BASE_DOMAIN}
       - SERVICE_LEARNINGLOCKER_API_URL=http://learninglockerapi
       - SERVICE_LEARNINGLOCKER_API_AUTH
@@ -149,7 +150,6 @@ services:
       - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
       - SERVICE_URL_TAG=http://tagservice.${BASE_DOMAIN}
       - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_TRANSLATION=http://translationservice.${BASE_DOMAIN}
       - JWT_SERIAL=${JWT_SERIAL}
     depends_on:
       - logger
@@ -343,6 +343,17 @@ services:
       options:
         fluentd-address: "localhost:24224"
         tag: "slidewiki.tagservice"
+
+  translationservice:
+    environment:
+      - VIRTUAL_HOST=translationservice.${BASE_DOMAIN}
+    depends_on:
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "slidewiki.translationservice"
 
   nlpstore:
     environment:
