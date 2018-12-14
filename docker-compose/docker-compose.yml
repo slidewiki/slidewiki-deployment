@@ -192,6 +192,7 @@ services:
     depends_on:
       - unoconvservice
       - deckservice
+      - tagservice
       - fileservice
       - mongodb
 
