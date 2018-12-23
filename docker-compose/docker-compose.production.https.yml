@@ -18,7 +18,7 @@ services:
   ##
 
   maintenance:
-    image: slidewiki/maintenance:${SLIDEWIKI_VERSION}
+    image: slidewiki/maintenance:latest
     restart: always
     expose:
       - "80"
