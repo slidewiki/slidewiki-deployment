@@ -5,6 +5,7 @@ volumes:
   learninglocker-data:
   files:
     external: true
+  certs:
 
 services:
 
@@ -12,10 +13,22 @@ services:
     image: jwilder/nginx-proxy
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - certs:/etc/nginx/certs:ro
     environment:
       - BASENAME=${BASE_DOMAIN}
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+    volumes_from:
+      - webserver
 
   maildev: 
     image: djfarrelly/maildev
@@ -25,6 +38,9 @@ services:
       - 80
     environment:
       - VIRTUAL_HOST=maildev.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=maildev.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - VIRTUAL_PORT=80
 
   agendash:
@@ -34,6 +50,9 @@ services:
       - 3000
     environment:
       - VIRTUAL_HOST=agendash.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=agendash.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - MONGODB_URI=mongodb://${BASE_DOMAIN}:27017/slidewiki
       - MONGODB_COLLECTION=agendaJobs
 
@@ -60,6 +79,9 @@ services:
       - nlpstoreupdater
     environment:
       - VIRTUAL_HOST=${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - SERVICE_USER_PRIVATE_RECAPTCHA_KEY=${RECAPTCHA_PRIVATE_KEY}
       - SERVICE_USER_PUBLIC_RECAPTCHA_KEY=${RECAPTCHA_PUBLIC_KEY}
       - SERVICE_USER_APIKEY
@@ -70,11 +92,11 @@ services:
       - SERVICE_URL_TAG
       - SERVICE_URL_QUESTION
       - SERVICE_URL_SEARCH
-      - SERVICE_URL_USER=http://userservice.${BASE_DOMAIN}
-      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_SIGNALING=http://signalingservice.${BASE_DOMAIN}
-      - SERVICE_URL_IMPORT=http://importservice.${BASE_DOMAIN}/importPPTX
+      - SERVICE_URL_USER=https://userservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
+      - SERVICE_URL_SIGNALING=https://signalingservice.${BASE_DOMAIN}
+      - SERVICE_URL_IMPORT=https://importservice.${BASE_DOMAIN}/importPPTX
       - SERVICE_URL_NLP=http://nlpservice:9000
       - SERVICE_URL_ANALYTICS=http://analyticsservice:8080
       - SERVICE_URL_RECOMMENDER=http://recommenderservice:8000
@@ -91,9 +113,12 @@ services:
     image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=deckservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
-      - URL_PLATFORM=http://${BASE_DOMAIN}
+      - URL_PLATFORM=https://${BASE_DOMAIN}
       - SERVICE_URL_USER
       - SERVICE_URL_TAG
       - SERVICE_URL_FILE
@@ -109,6 +134,9 @@ services:
     image: slidewiki/webrtcsignalingservice:${SLIDEWIKI_VERSION}
     environment:
       - VIRTUAL_HOST=signalingservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=signalingservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
     volumes:
       - /data/slidewiki/slidewiki-deployment/docker-compose/signalingservice/twitterConfig.json:/nodeApp/config.json:ro
@@ -121,12 +149,15 @@ services:
       - xapi
     environment:
       - VIRTUAL_HOST=activitiesservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=activitiesservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
       - SERVICE_URL_NOTIFICATION
       - SERVICE_URL_USER
-      - URL_PLATFORM=http://${BASE_DOMAIN}
+      - URL_PLATFORM=https://${BASE_DOMAIN}
       - LRS_ENDPOINT
       - LRS_PUBLIC_KEY
       - LRS_SECRET
@@ -137,6 +168,9 @@ services:
       - deckservice
     environment:
       - VIRTUAL_HOST=discussionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=discussionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
@@ -146,6 +180,9 @@ services:
     image: slidewiki/notificationservice:${SLIDEWIKI_VERSION}
     environment:
       - VIRTUAL_HOST=notificationservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=notificationservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_USER
@@ -158,10 +195,13 @@ services:
       - unoconvservice
     environment:
       - VIRTUAL_HOST=importservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=importservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - SERVICE_URL_DECK
       - SERVICE_URL_UNOCONV
-      - SERVICE_URL_FILE=http://fileservice.${BASE_DOMAIN}
+      - SERVICE_URL_FILE=https://fileservice.${BASE_DOMAIN}
       - JWT_SERIAL
 
   userservice:
@@ -172,9 +212,12 @@ services:
       - 80
     environment:
       - VIRTUAL_HOST=userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=userservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
-      - URL_PLATFORM=http://${BASE_DOMAIN}
+      - URL_PLATFORM=https://${BASE_DOMAIN}
       - NODE_TLS_REJECT_UNAUTHORIZED=0
       - APIKEY=${SERVICE_USER_APIKEY}
       - SECRET_REVIEW_KEY
@@ -191,8 +234,11 @@ services:
       - deckservice
     environment:
       - VIRTUAL_HOST=pdfservice.${BASE_DOMAIN}
-      - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
-      - SERVICE_URL_PDF=http://pdfservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=pdfservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
+      - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
+      - SERVICE_URL_PDF=https://pdfservice.${BASE_DOMAIN}
       - SERVICE_URL_DECK
       - SERVICE_URL_USER
 
@@ -204,10 +250,13 @@ services:
       - deckservice
     environment:
       - VIRTUAL_HOST=fileservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=fileservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - APPLICATION_PATH=/data/files
-      - SERVICE_URL_PLATFORM=http://${BASE_DOMAIN}
+      - SERVICE_URL_PLATFORM=https://${BASE_DOMAIN}
       - SERVICE_URL_DECK
 
   searchservice:
@@ -217,6 +266,9 @@ services:
       - deckservice
     environment:
       - VIRTUAL_HOST=searchservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=searchservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - DATABASE_URL=${MONGODB_HOST}
       - APPLICATION_PORT=80
       - SOLR_CORE=swikcore
@@ -226,7 +278,7 @@ services:
       - SERVICE_URL_USER
 
   searchindexer:
-    image: slidewiki/searchservice:${SLIDEWIKI_VERSION}
+    image: slidewiki/searchservice:latest-dev
     command: 'node worker'
     depends_on:
       # - solr
@@ -246,6 +298,9 @@ services:
     image: slidewiki/tagservice:${SLIDEWIKI_VERSION}
     environment:
       - VIRTUAL_HOST=tagservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=tagservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
 
@@ -255,6 +310,9 @@ services:
       - 9000
     environment:
       - VIRTUAL_HOST=nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=nlpservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_SECRET=${SERVICE_NLP_SECRET}
       - SERVICE_URL_DECK
       - SERVICE_URL_NLPSTORE
@@ -263,11 +321,14 @@ services:
       - nlpstore
 
   nlpstore:
-    image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+    image: slidewiki/nlpstore:latest-dev
     expose:
       - 80
     environment:
       - VIRTUAL_HOST=nlpstore.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=nlpstore.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
@@ -281,7 +342,7 @@ services:
       - deckservice
 
   nlpstoreupdater:
-    image: slidewiki/nlpstore:${SLIDEWIKI_VERSION}
+    image: slidewiki/nlpstore:latest-dev
     command: 'node worker'
     environment:
       - DATABASE_PORT=27017
@@ -305,15 +366,21 @@ services:
       - deckservice
     environment:
       - VIRTUAL_HOST=questionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=questionservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - APPLICATION_PORT=80
       - DATABASE_URL=${MONGODB_HOST}
       - SERVICE_URL_DECK
 
 
   recommenderservice:
-    image: slidewiki/recommenderservice:${SLIDEWIKI_VERSION}
+    image: slidewiki/recommenderservice:latest-dev
     environment:
       - VIRTUAL_HOST=recommenderservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=recommenderservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - FLASK_SERVER_NAME=recommenderservice.${BASE_DOMAIN}
       - MAX_FEATURES=2000
       - SERVICE_URL_DECK
@@ -336,6 +403,9 @@ services:
       - 8080
     environment:
       - VIRTUAL_HOST=analyticsservice.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=analyticsservice.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - SERVICE_URL_ACTIVITIES
 
 
@@ -362,6 +432,9 @@ services:
       - learninglocker-data:/opt/learninglocker/storage
     environment:
       - VIRTUAL_HOST=api.learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=api.learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - VIRTUAL_PORT=${SERVICE_PORT_LEARNINGLOCKER_API}
       - DOMAIN_NAME=${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
@@ -385,6 +458,9 @@ services:
       - learninglocker-data:/opt/learninglocker/storage
     environment:
       - VIRTUAL_HOST=learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_HOST=learninglocker.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL
+      - LETSENCRYPT_TEST
       - VIRTUAL_PORT=${SERVICE_PORT_LEARNINGLOCKER}
       - DOMAIN_NAME=${BASE_DOMAIN}
       - APP_SECRET=${LEARNINGLOCKER_SECRET}
