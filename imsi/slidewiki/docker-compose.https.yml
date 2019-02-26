@@ -62,7 +62,9 @@ services:
     expose:
       - 3000
     depends_on:
+      - webserver
       - deckservice
+      - userservice
       - activitiesservice
       - discussionservice
       - notificationservice
@@ -73,10 +75,7 @@ services:
       - tagservice
       - signalingservice
       - questionservice
-      - analyticsservice
-      - nlpservice
       - searchindexer
-      - nlpstoreupdater
     environment:
       - VIRTUAL_HOST=${BASE_DOMAIN}
       - LETSENCRYPT_HOST=${BASE_DOMAIN}
