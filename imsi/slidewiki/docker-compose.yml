@@ -39,7 +39,7 @@ services:
 
 
   platform:
-    image: slidewiki/platform:${SLIDEWIKI_VERSION}
+    image: slidewiki/platform:${SLIDEWIKI_TEST_VERSION}
     expose:
       - 3000
     depends_on:
@@ -87,7 +87,7 @@ services:
       - LOGGING_LEVEL
 
   deckservice:
-    image: slidewiki/deckservice:${SLIDEWIKI_VERSION}
+    image: slidewiki/deckservice:${SLIDEWIKI_TEST_VERSION}
     environment:
       - VIRTUAL_HOST=deckservice.${BASE_DOMAIN}
       - APPLICATION_PORT=80
