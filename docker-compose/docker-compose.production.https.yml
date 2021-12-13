@@ -79,7 +79,7 @@ services:
       - VIRTUAL_HOST=solr.${BASE_DOMAIN}
       - LETSENCRYPT_HOST=solr.${BASE_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-      - JAVA_OPTS=-Xmx1g
+      - JAVA_OPTS=-Xmx1g -Dlog4j2.formatMsgNoLookups=true
     depends_on:
       - logger
     logging:
